@@ -4,6 +4,7 @@ import android.app.Application
 import core.di.coreDatabaseModule
 import core.di.coreNetworkModule
 import core.di.corePreferencesModule
+import core.di.coreConfigModule
 import di.appModule
 import feature.news.di.newsModule
 import feature.settings.di.settingsModule
@@ -20,6 +21,7 @@ class MyApp : Application() {
                 coreNetworkModule,
                 coreDatabaseModule,
                 corePreferencesModule,
+                coreConfigModule,
                 
                 // Feature modules
                 newsModule,

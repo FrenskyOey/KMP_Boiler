@@ -60,6 +60,11 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
         
+        // We need room compiler for KSP
+        // Since we removed kspCommonMainMetadata, we might need to add it per target or via top-level dependencies
+        // But better: Add it to the top-level dependencies block for specific configurations if needed.
+
+        
         androidMain.dependencies {
             implementation(libs.ktor.client.android)
             implementation(libs.koin.android)
@@ -83,6 +88,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    
+    buildFeatures {
+        buildConfig = true
+    }
+    
+    defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        buildConfigField("String", "BASE_API_URL", "\"https://cd841015-7e2e-4a18-8082-a7c23d45097e.mock.pstmn.io/v1/\"")
+        buildConfigField("String", "FLAVOR_NAME", "\"dev\"")
+    }
 }
 
 room {
@@ -91,5 +106,9 @@ room {
 
 dependencies {
     // KSP for Room
-    add("kspCommonMainMetadata", libs.androidx.room.compiler)
+    // add("kspCommonMainMetadata", libs.androidx.room.compiler)
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosX64", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
 }

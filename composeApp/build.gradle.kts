@@ -51,6 +51,7 @@ kotlin {
             
             // Koin
             implementation(libs.koin.compose)
+            implementation(libs.koin.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -90,13 +91,13 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".staging"
             resValue("string", "app_name", "KMP Learn (Staging)")
-            buildConfigField("String", "BASE_API_URL", "\"https://325f5223-596e-40f7-86e2-542ef4003b98.mock.pstmn.io/\"")
+            buildConfigField("String", "BASE_API_URL", "\"https://cd841015-7e2e-4a18-8082-a7c23d45097e.mock.pstmn.io/v1/\"")
             buildConfigField("String", "FLAVOR_NAME", "\"Staging\"")
         }
         create("production") {
             dimension = "environment"
             resValue("string", "app_name", "KMP Learn")
-            buildConfigField("String", "BASE_API_URL", "\"https://325f5223-596e-40f7-86e2-542ef4003b98.mock.pstmn.io/\"")
+            buildConfigField("String", "BASE_API_URL", "\"https://cd841015-7e2e-4a18-8082-a7c23d45097e.mock.pstmn.io/v1/\"")
              buildConfigField("String", "FLAVOR_NAME", "\"Production\"")
         }
     }

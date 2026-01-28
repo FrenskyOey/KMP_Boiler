@@ -2,7 +2,7 @@ package feature.news.data.repository
 
 import core.domain.model.AppException
 import core.domain.model.Result
-import feature.news.data.model.ArticleDto
+import feature.news.data.model.ArticleResponse
 import feature.news.data.testhelper.FakeNewsLocalDataSource
 import feature.news.data.testhelper.FakeNewsRemoteDataSource
 import kotlinx.coroutines.test.runTest
@@ -13,23 +13,23 @@ import kotlinx.coroutines.flow.toList
 
 class NewsFeedRepositoryImplTest {
 
-    private val fakeRemoteDataSource = FakeNewsRemoteDataSource()
+    private val remoteDataSource = FakeNewsRemoteDataSource()
     private val fakeLocalDataSource = FakeNewsLocalDataSource()
-    private val repository = NewsFeedRepositoryImpl(fakeRemoteDataSource, fakeLocalDataSource)
+    private val repository = NewsFeedRepositoryImpl(remoteDataSource, fakeLocalDataSource)
 
     @Test
-    fun `getArticles successfully fetches from remote, saves to local, and emits success`() = runTest {
+    fun `getArticles emits Success when remote fetch succeeds`() = runTest {
         // Given
-        val articleDto = ArticleDto(
-            id = 1,
-            title = "Title",
-            content = "Content",
-            imageUrl = "url",
-            topic = "Topic",
-            likes = 10,
-            views = 100
+        val fakeArticles = listOf(
+            ArticleResponse(
+                id = 1,
+                title = "Title",
+                content = "Content",
+                imageUrl = "url",
+                topic = "tech"
+            )
         )
-        fakeRemoteDataSource.success(listOf(articleDto))
+        remoteDataSource.mockArticles = fakeArticles
 
         // When
         val results = repository.getArticles(1).toList()
@@ -50,8 +50,7 @@ class NewsFeedRepositoryImplTest {
     @Test
     fun `getArticles emits error when remote fails`() = runTest {
         // Given
-        val exception = RuntimeException("Network error")
-        fakeRemoteDataSource.failure(exception)
+        remoteDataSource.shouldReturnError = true
 
         // When
         val results = repository.getArticles(1).toList()

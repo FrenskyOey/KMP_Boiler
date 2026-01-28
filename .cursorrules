@@ -184,10 +184,227 @@ core/
 │   │   └── preferences/       # DataStore
 │   └── mapper/                # Mapper interface
 ├── domain/
-│   └── model/                 # Shared domain models
+│   ├── model/                 # Shared domain models
+│   └── config/                # App configuration
 ├── di/                        # Core DI modules
 └── util/                      # Utilities
 ```
+
+## Environment Configuration (AppConfig)
+
+### CRITICAL: All Remote Services MUST Use AppConfig
+
+**Rule:** Every API service, remote data source, or network client MUST inject and use `AppConfig` for base URLs and environment-specific settings.
+
+### AppConfig Structure
+
+```kotlin
+// ✅ CORRECT - AppConfig in core/domain/config
+core/domain/config/
+├── AppConfig.kt                    # Interface (commonMain)
+├── AndroidAppConfig.kt             # Android implementation (androidMain)
+└── IosAppConfig.kt                 # iOS implementation (iosMain)
+
+// AppConfig.kt (commonMain)
+interface AppConfig {
+    val baseApiUrl: String
+    val flavorName: String
+    // Add other environment-specific configs here
+}
+
+expect fun createAppConfig(): AppConfig
+```
+
+### Platform Implementations
+
+**Android (uses BuildConfig):**
+```kotlin
+// AndroidAppConfig.kt (androidMain)
+class AndroidAppConfig : AppConfig {
+    override val baseApiUrl: String = BuildConfig.BASE_API_URL
+    override val flavorName: String = BuildConfig.FLAVOR_NAME
+}
+
+actual fun createAppConfig(): AppConfig = AndroidAppConfig()
+
+// shared/build.gradle.kts
+android {
+    buildFeatures {
+        buildConfig = true
+    }
+    defaultConfig {
+        buildConfigField("String", "BASE_API_URL", "\"https://api.example.com/v1/\"")
+        buildConfigField("String", "FLAVOR_NAME", "\"dev\"")
+    }
+}
+```
+
+**iOS (uses Info.plist or hardcoded):**
+```kotlin
+// IosAppConfig.kt (iosMain)
+class IosAppConfig : AppConfig {
+    // Option 1: Hardcoded for now
+    override val baseApiUrl: String = "https://api.example.com/v1/"
+    override val flavorName: String = "dev"
+    
+    // Option 2: Read from Info.plist (future enhancement)
+    // val url = NSBundle.mainBundle.objectForInfoDictionaryKey("BASE_API_URL") as? String
+}
+
+actual fun createAppConfig(): AppConfig = IosAppConfig()
+```
+
+### Dependency Injection Setup
+
+```kotlin
+// ✅ CORRECT - CoreConfigModule provides AppConfig
+// core/di/CoreConfigModule.kt
+val coreConfigModule = module {
+    single { createAppConfig() }
+}
+
+// Initialize in app
+startKoin {
+    modules(
+        coreConfigModule,      // MUST be included
+        coreNetworkModule,
+        // ... other modules
+    )
+}
+```
+
+### Using AppConfig in API Services
+
+```kotlin
+// ✅ CORRECT - Inject AppConfig into API service
+class NewsApiService(
+    private val httpClient: HttpClient,
+    private val appConfig: AppConfig  // REQUIRED
+) {
+    private val endpoint = "${appConfig.baseApiUrl}article"
+    
+    suspend fun fetchArticles(page: Int): ArticleListResponse {
+        return httpClient.get(endpoint) {
+            parameter("page", page)
+        }.body()
+    }
+}
+
+// ✅ CORRECT - DI module injects AppConfig
+val newsModule = module {
+    single { NewsApiService(get(), get()) }  // get() resolves AppConfig
+}
+
+// ❌ WRONG - Hardcoded URL
+class NewsApiService(private val httpClient: HttpClient) {
+    private val endpoint = "https://api.example.com/v1/article"  // NEVER DO THIS!
+}
+
+// ❌ WRONG - URL in companion object
+class NewsApiService(private val httpClient: HttpClient) {
+    companion object {
+        const val BASE_URL = "https://api.example.com/v1/"  // NEVER DO THIS!
+    }
+}
+```
+
+### AppConfig Best Practices
+
+**✅ DO:**
+- Always inject `AppConfig` into services that need URLs or environment settings
+- Use `AppConfig` for: base URLs, API keys, feature flags, environment names
+- Keep `AppConfig` in `core/domain/config/`
+- Provide platform-specific implementations via `expect/actual`
+- Include `coreConfigModule` in Koin initialization
+
+**❌ DON'T:**
+- Hardcode URLs anywhere in the codebase
+- Create feature-specific config classes (use shared `AppConfig`)
+- Put configuration in companion objects or constants
+- Skip injecting `AppConfig` into remote services
+
+### iOS Koin Initialization
+
+**CRITICAL:** iOS apps must call `initKoin()` before any UI is created.
+
+```kotlin
+// ✅ CORRECT - KoinHelper.kt (composeApp/iosMain)
+fun initKoin() {
+    startKoin {
+        modules(
+            coreConfigModule,      // Include config module
+            coreNetworkModule,
+            // ... other modules
+        )
+    }
+}
+
+// iOSApp.swift
+import ComposeApp
+
+@main
+struct iOSApp: App {
+    init() {
+        KoinHelperKt.initKoin()  // MUST call before UI
+    }
+    
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+
+// ❌ WRONG - Not calling initKoin()
+@main
+struct iOSApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()  // Koin not initialized - will crash!
+        }
+    }
+}
+```
+
+### Adding New Environment Variables
+
+When adding new environment-specific configuration:
+
+1. **Add to AppConfig interface:**
+```kotlin
+interface AppConfig {
+    val baseApiUrl: String
+    val flavorName: String
+    val newSetting: String  // Add here
+}
+```
+
+2. **Update Android implementation:**
+```kotlin
+class AndroidAppConfig : AppConfig {
+    override val newSetting: String = BuildConfig.NEW_SETTING
+}
+
+// build.gradle.kts
+buildConfigField("String", "NEW_SETTING", "\"value\"")
+```
+
+3. **Update iOS implementation:**
+```kotlin
+class IosAppConfig : AppConfig {
+    override val newSetting: String = "value"
+}
+```
+
+4. **Use in services:**
+```kotlin
+class MyApiService(
+    private val httpClient: HttpClient,
+    private val appConfig: AppConfig
+) {
+    private val setting = appConfig.newSetting
+}
+
 
 ## Dependency Injection Rules
 
@@ -437,6 +654,8 @@ Before accepting code, verify:
 - [ ] Has proper state management
 - [ ] Follows Kotlin coding conventions
 - [ ] No hardcoded values
+- [ ] **No hardcoded URLs - uses AppConfig**
+- [ ] **All API services inject AppConfig**
 - [ ] Uses theme helpers
 - [ ] Has appropriate documentation
 
