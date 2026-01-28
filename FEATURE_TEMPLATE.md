@@ -37,6 +37,7 @@ Create UI in `composeApp/src/commonMain/kotlin/feature/[feature_name]/`.
 - `Screen.kt` (Composable)
 - `ViewModel.kt` (Shared ViewModel)
 - `components/` (Local components)
+- `state/` (viewModel state for event, uiState, effect)
 
 ## Step 6: Navigation
 Update `composeApp/src/commonMain/kotlin/core/navigation/Screen.kt` and `NavGraph.kt`.

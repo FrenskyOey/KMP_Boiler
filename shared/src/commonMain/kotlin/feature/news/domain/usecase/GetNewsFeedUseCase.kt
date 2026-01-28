@@ -1,13 +1,14 @@
 package feature.news.domain.usecase
 
 import core.domain.model.Result
-import feature.news.domain.model.NewsFeed
+import feature.news.domain.model.Article
 import feature.news.domain.repository.NewsFeedRepository
+import kotlinx.coroutines.flow.Flow
 
 class GetNewsFeedUseCase(
     private val repository: NewsFeedRepository
 ) {
-    suspend operator fun invoke(): Result<List<NewsFeed>> {
-        return repository.getNewsFeed()
+    operator fun invoke(page: Int): Flow<Result<List<Article>>> {
+        return repository.getArticles(page)
     }
 }

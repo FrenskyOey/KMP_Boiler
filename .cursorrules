@@ -1,4 +1,19 @@
 # Cursor/Antigravity Rules for KMP Feature-First Architecture
+## Project Documentation
+
+Before answering questions, consult these documentation files:
+- **ARCHITECTURE.md** - For architecture and structure questions
+- **CODING_STANDARDS.md** - For code style and conventions
+- **TECH_STACK.md** - For technology and library choices
+- **FEATURE_TEMPLATE.md** - When adding new features
+
+When the user asks about:
+- Architecture/structure → Read ARCHITECTURE.md first
+- Code style/conventions → Read CODING_STANDARDS.md first
+- Adding features → Read FEATURE_TEMPLATE.md first
+- Technology choices → Read TECH_STACK.md first
+
+Always follow the guidelines in these documents.
 
 ## Project Context
 This is a Kotlin Multiplatform (KMP) project with **Feature-First Modular Architecture**. Each feature is self-contained with its own data, domain, and DI layers.
@@ -461,30 +476,5 @@ if (BuildConfig.FEATURE_NEWS_ENABLED) {
     modules(newsModule)
 }
 ```
-
-## Documentation Standards
-
-Each feature should have:
-
-```kotlin
-/**
- * News Feature
- * 
- * Handles news feed display, pagination, and detail viewing.
- * 
- * Dependencies:
- * - core.data.remote for API utilities
- * - core.domain.model for Result wrapper
- * - core.data.local for database
- * 
- * Provides:
- * - News feed list with pagination
- * - News detail view
- * - Offline caching
- */
-package com.example.feature.news
-```
-
----
 
 **Remember: Feature-first architecture is about building scalable, maintainable apps where features are isolated, self-contained, and can evolve independently. These rules ensure that architecture is preserved.**
