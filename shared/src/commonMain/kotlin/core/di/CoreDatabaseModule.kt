@@ -1,5 +1,8 @@
 package core.di
 
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import core.data.local.database.AppDatabase
+import core.data.local.database.getDatabaseBuilder
 import org.koin.dsl.module
 
 // We need a way to create the database. 
@@ -10,6 +13,9 @@ import org.koin.dsl.module
 // Or better, define the expect function.
 
 val coreDatabaseModule = module {
-    // single { createDatabase(get()) } 
-    // Commented out until we have platform specific implementations for createDatabase
+    single<AppDatabase> { 
+        getDatabaseBuilder()
+            .setDriver(BundledSQLiteDriver())
+            .build()
+    }
 }
