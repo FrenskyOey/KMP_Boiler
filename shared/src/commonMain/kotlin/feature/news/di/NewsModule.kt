@@ -24,4 +24,5 @@ val newsModule = module {
     
     // Use Cases
     factory { GetNewsFeedUseCase(get()) }
+    factory { feature.news.domain.usecase.GetArticleCountUseCase(get()) }
 }

@@ -75,6 +75,7 @@ Package.resolved
 ### Kotlin ###
 *.kotlin_module
 *.kotlin_metadata
+*.klib
 
 ### IntelliJ IDEA ###
 .idea/

@@ -8,14 +8,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import core.theme.AppTheme
 
+import feature.news.list.NewsScreen
+
 @Composable
 fun App() {
     AppTheme {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Hello, KMP!")
-        }
+        NewsScreen()
     }
 }

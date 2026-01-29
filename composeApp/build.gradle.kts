@@ -51,6 +51,7 @@ kotlin {
             
             // Koin
             implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.core)
         }
         commonTest.dependencies {
@@ -103,6 +104,11 @@ android {
     }
     buildFeatures {
         buildConfig = true
+    }
+    sourceSets {
+        getByName("debug") {
+            resources.srcDirs("src/commonMain")
+        }
     }
 }
 

@@ -1,5 +1,18 @@
 package com.interview.prep.kmp_learn
 
 import androidx.compose.ui.window.ComposeUIViewController
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.network.ktor3.KtorNetworkFetcherFactory
 
-fun MainViewController() = ComposeUIViewController { App() }
+fun MainViewController() = ComposeUIViewController(
+    configure = {
+        SingletonImageLoader.setSafe { context ->
+            ImageLoader.Builder(context)
+                .components {
+                    add(KtorNetworkFetcherFactory())
+                }
+                .build()
+        }
+    }
+) { App() }
