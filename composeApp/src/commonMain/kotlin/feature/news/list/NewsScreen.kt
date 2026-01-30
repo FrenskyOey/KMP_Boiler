@@ -93,17 +93,9 @@ private fun NewsFeedContent(
         }
     }
 
-    // Pull to refresh logic
-    // We consider refreshing if loading is true AND we are at page 1 (and potentially verify empty list or not)
-    // But since we want to show spinner ON TOP of content, we use PullToRefreshBox.
-    // However, viewModel.isLoading is global.
-    // If we are paginating (page > 1), we don't want the top spinner to show.
-    // So isRefreshing = state.isLoading && state.page == 1
-    
-    val isRefreshing = state.isLoading && state.page == 1
-
+    // is refresh is happen when user pull to refresh where the article data should not be empty
     PullToRefreshBox(
-        isRefreshing = isRefreshing,
+        isRefreshing = state.isRefresh,
         onRefresh = { viewModel.onIntent(NewsIntent.Refresh) },
         modifier = Modifier.fillMaxSize()
     ) {
@@ -113,7 +105,7 @@ private fun NewsFeedContent(
                 onRetry = { viewModel.onIntent(NewsIntent.Retry) }
             )
         } else if (!state.isLoading && state.articles.isEmpty()) {
-            EmptyState()
+            NewsEmptyWidget()
         } else {
             val listState = rememberLazyListState()
 
@@ -147,7 +139,7 @@ private fun NewsFeedContent(
                     )
                 }
                 
-                if (state.isLoading && state.page > 1) {
+                if (state.isLoading && !state.articles.isEmpty()) {
                     item {
                         Box(
                             modifier = Modifier.fillMaxWidth().padding(16.dp),

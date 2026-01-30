@@ -42,7 +42,7 @@ class NewsFeedViewModel(
     }
 
     private fun refresh() {
-        _uiState.update { it.copy(page = 1, isEndReached = false, error = null) }
+        _uiState.update { it.copy(page = 1, isEndReached = false, error = null, isRefresh = true)}
         loadPage(1)
     }
 
@@ -68,23 +68,26 @@ class NewsFeedViewModel(
                         val newArticles = result.data
                         if (newArticles.isEmpty()) {
                             _uiState.update { 
-                                it.copy(isLoading = false, isEndReached = true) 
+                                it.copy(isLoading = false, isEndReached = true, isRefresh = false)
                             }
                         } else {
+                            val isRefreshed = _uiState.value.isRefresh
+
                             _uiState.update { 
                                 it.copy(
                                     isLoading = false,
                                     articles = if (page == 1) newArticles else it.articles + newArticles,
-                                    page = page
+                                    page = page,
+                                    isRefresh = false
                                 ) 
                             }
-                            if (page == 1) {
+                            if (isRefreshed) {
                                 _effect.send(NewsEffect.ShowToast("Refreshed"))
                             }
                         }
                     }
                     is Result.Error -> {
-                        _uiState.update { it.copy(isLoading = false, error = result.exception.message ?: "Unknown Error") }
+                        _uiState.update { it.copy(isLoading = false, error = result.exception.message ?: "Unknown Error", isRefresh = false) }
                         _effect.send(NewsEffect.ShowError(result.exception.message ?: "Error loading news"))
                     }
                 }

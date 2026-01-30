@@ -8,7 +8,8 @@ data class NewsState(
     val error: String? = null,
     val page: Int = 1,
     val isEndReached: Boolean = false,
-    val totalCachedCount: Int = 0
+    val totalCachedCount: Int = 0,
+    val isRefresh: Boolean = false
 )
 
 sealed interface NewsIntent {
