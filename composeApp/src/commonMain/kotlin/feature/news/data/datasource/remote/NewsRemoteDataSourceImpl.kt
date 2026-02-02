@@ -1,9 +1,10 @@
 package feature.news.data.datasource.remote
 
 import core.domain.model.AppException
+import feature.news.data.api.NewsApiService
 import feature.news.data.datasource.NewsDataSource
 import feature.news.data.model.response.ArticleResponse
-import feature.news.data.api.NewsApiService
+import feature.news.data.api.NewsApiServiceImp
 
 class NewsRemoteDataSourceImpl(
     private val apiService: NewsApiService
