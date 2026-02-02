@@ -6,16 +6,18 @@ This project follows a **Feature-First** modular architecture to ensure scalabil
 
 ### Structure Overview
 ```
-shared/
-└── feature/
-    ├── news/
-    │   ├── data/
-    │   ├── domain/
-    │   └── ui/ (UI Logic / ViewModels in CommonMain)
-    └── settings/
-        ├── data/
-        ├── domain/
-        └── ui/
+composeApp/
+├── src/
+│   ├── commonMain/
+│   │   ├── kotlin/
+│   │   │   ├── core/
+│   │   │   └── feature/
+│   │   │       ├── news/
+│   │   │       └── settings/
+│   │   └── composeResources/
+│   ├── androidMain/
+│   ├── desktopMain/
+│   └── iosMain/
 ```
 
 ### Key Principles
@@ -29,8 +31,7 @@ shared/
 
 ### Module Responsibilities
 
-- **composeApp**: The entry point for the Android application. It sets up the dependency graph (Koin), handles navigation (if at app level), and delegates to feature screens.
-- **shared**: The heart of the application.
+- **composeApp**: The main module containing all code: UI (Compose), Business Logic (Domain/Data), and Platform adaptations.
     - `core`: Infrastructure (Network, DB, Preferences), Base Models (Result, Exception), Common UI Theme/Components.
     - `feature/[name]`: Specific feature implementation.
         - `domain`: Pure Kotlin business logic, Use Cases, Repository Interfaces, Models.

@@ -6,6 +6,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.room)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -40,15 +43,22 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.compose.uiTooling)
             implementation(libs.koin.android)
+            
+            // From shared androidMain
+            implementation(libs.ktor.client.android)
+            implementation(libs.kotlinx.coroutines.android)
         }
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
+                
+                // From shared desktopMain
+                implementation(libs.ktor.client.android) // Using Android client for JVM
+                implementation(libs.kotlinx.coroutines.swing) // Main dispatcher for desktop
             }
         }
         commonMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
-            implementation(projects.shared)
             
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -71,9 +81,39 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.core)
+            
+            // --- DEPENDENCIES FROM SHARED ---
+            // Coroutines
+            implementation(libs.kotlinx.coroutines.core)
+            
+            // Serialization
+            implementation(libs.kotlinx.serialization.json)
+            
+            // DateTime
+            implementation(libs.kotlinx.datetime)
+            
+            // Ktor
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
+            
+            // Room
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.sqlite.bundled)
+            
+            // DataStore
+            implementation(libs.androidx.datastore.preferences)
         }
+        
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+        }
+        
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            // From shared commonTest
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }
@@ -130,6 +170,19 @@ android {
     }
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    // KSP for Room
+    add("kspAndroid", libs.androidx.room.compiler)
+    // kspIosX64 removed as target not present
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    add("kspDesktop", libs.androidx.room.compiler)
+}
+
 compose.desktop {
     application {
         mainClass = "MainKt"
@@ -151,4 +204,3 @@ compose.desktop {
         }
     }
 }
-

@@ -1,6 +1,6 @@
 package core.domain.config
 
-import com.interview.prep.kmp_learn.shared.BuildConfig
+import com.interview.prep.kmp_learn.BuildConfig
 
 class AndroidAppConfig : AppConfig {
     override val baseApiUrl: String = BuildConfig.BASE_API_URL

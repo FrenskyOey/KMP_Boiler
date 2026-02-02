@@ -22,7 +22,7 @@ This is a Kotlin Multiplatform (KMP) project with **Feature-First Modular Archit
 
 ### Feature Structure
 ```
-shared/src/commonMain/kotlin/
+composeApp/src/commonMain/kotlin/
 ├── core/               # Shared utilities ONLY
 │   ├── data/
 │   ├── domain/

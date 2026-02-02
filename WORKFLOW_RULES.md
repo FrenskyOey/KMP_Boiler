@@ -20,34 +20,24 @@ This document defines the workflow for implementing features in a Kotlin Multipl
 ### Module Organization
 ```
 project-root/
-├── shared/
-│   └── src/
-│       └── commonMain/
-│           └── kotlin/
+├── composeApp/
+├── src/
+│   └── commonMain/
+│       └── kotlin/
+│           ├── core/
+│           ├── feature/
+│           │   └── [feature-name]/
+│           │       ├── domain/
+│           │       ├── data/
+│           │       └── ui/
+│           └── [package-name]/
 │               └── feature/
 │                   └── [feature-name]/
-│                       ├── domain/
-│                       │   ├── domain-plan.md
-│                       │   ├── model/
-│                       │   ├── repository/
-│                       │   └── usecase/
-│                       └── data/
-│                           ├── data-plan.md
-│                           ├── model/
-│                           ├── source/
-│                           └── repository/
-├── composeApp/
-│   └── src/
-│       └── commonMain/
-│           └── kotlin/
-│               └── [package-name]/
-│                   └── feature/
-│                       └── [feature-name]/
-│                           ├── ui-plan.md
-│                           ├── viewmodel/
-│                           ├── state/
-│                           ├── component/
-│                           └── screen/
+│                       ├── ui-plan.md
+│                       ├── viewmodel/
+│                       ├── state/
+│                       ├── component/
+│                       └── screen/
 ```
 
 ### Layer Dependencies
@@ -129,9 +119,9 @@ AI: "Perfect! Proceeding to generate plans..."
 
 #### What AI Should Do:
 1. Review all answers collected in Phase 0
-2. Generate three plan documents with documented requirements:
-   - `domain-plan.md` → Store in `shared/src/commonMain/kotlin/feature/[feature-name]/domain/`
-   - `data-plan.md` → Store in `shared/src/commonMain/kotlin/feature/[feature-name]/data/`
+3. Generate three plan documents with documented requirements:
+   - `domain-plan.md` → Store in `composeApp/src/commonMain/kotlin/feature/[feature-name]/domain/`
+   - `data-plan.md` → Store in `composeApp/src/commonMain/kotlin/feature/[feature-name]/data/`
    - `ui-plan.md` → Store in `composeApp/src/commonMain/kotlin/[package]/feature/[feature-name]/`
 3. Include "Requirements Clarification Summary" section in each plan with answers from Phase 0
 
