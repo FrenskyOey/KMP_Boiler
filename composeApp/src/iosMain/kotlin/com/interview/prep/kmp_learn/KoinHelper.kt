@@ -9,7 +9,7 @@ import feature.news.di.newsModule
 import feature.settings.di.settingsModule
 import org.koin.core.context.startKoin
 
-fun initKoin() {
+fun doInitKoin() {
     startKoin {
         modules(
             coreNetworkModule,

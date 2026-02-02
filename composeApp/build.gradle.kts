@@ -9,6 +9,8 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(17)
+    
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -25,17 +27,33 @@ kotlin {
         }
     }
     
+    jvm("desktop") {
+        compilations.all {
+            compilerOptions.configure {
+                jvmTarget.set(JvmTarget.JVM_17)
+            }
+        }
+    }
+    
     sourceSets {
         androidMain.dependencies {
-            implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.compose.uiTooling)
             implementation(libs.koin.android)
         }
+        val desktopMain by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+            }
+        }
         commonMain.dependencies {
+            implementation(libs.compose.uiToolingPreview)
             implementation(projects.shared)
             
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
+            implementation(libs.compose.material)
+            implementation(libs.compose.material.icons.extended)
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
@@ -112,7 +130,25 @@ android {
     }
 }
 
-dependencies {
-    debugImplementation(libs.compose.uiTooling)
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "KMP Learn Dashboard"
+            packageVersion = "1.0.0"
+            
+            macOS {
+                iconFile.set(project.file("src/desktopMain/resources/icon.icns"))
+            }
+            windows {
+                iconFile.set(project.file("src/desktopMain/resources/icon.ico"))
+            }
+            linux {
+                iconFile.set(project.file("src/desktopMain/resources/icon.png"))
+            }
+        }
+    }
 }
 

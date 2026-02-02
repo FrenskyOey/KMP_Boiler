@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -99,7 +99,7 @@ private fun NewsFeedContent(
         onRefresh = { viewModel.onIntent(NewsIntent.Refresh) },
         modifier = Modifier.fillMaxSize()
     ) {
-        if (!state.isLoading && state.error != null && state.articles.isEmpty()) {
+        if (state.isLoading && state.error != null && state.articles.isEmpty()) {
             ErrorState(
                 message = state.error!!,
                 onRetry = { viewModel.onIntent(NewsIntent.Retry) }
@@ -132,7 +132,7 @@ private fun NewsFeedContent(
                 verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(state.articles, key = { it.id }) { article ->
+                itemsIndexed(state.articles, key = { index, _ -> index }) { _, article ->
                     ArticleItem(
                         article = article,
                         onClick = { /* Handle click if needed */ }
