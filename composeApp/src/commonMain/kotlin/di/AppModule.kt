@@ -1,7 +1,8 @@
 package di
 
-import feature.news.list.NewsFeedViewModel
-import feature.settings.SettingsViewModel
+
+import feature.news.ui.main.NewsFeedViewModel
+import feature.settings.ui.main.SettingsViewModel
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 

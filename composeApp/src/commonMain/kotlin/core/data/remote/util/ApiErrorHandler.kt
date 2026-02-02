@@ -4,7 +4,7 @@ import core.domain.model.AppException
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ServerResponseException
-import io.ktor.utils.io.errors.IOException
+import kotlinx.io.IOException
 import kotlinx.serialization.SerializationException
 
 object ApiErrorHandler {

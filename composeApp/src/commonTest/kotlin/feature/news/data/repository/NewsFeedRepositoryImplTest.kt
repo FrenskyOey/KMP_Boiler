@@ -2,7 +2,7 @@ package feature.news.data.repository
 
 import core.domain.model.AppException
 import core.domain.model.Result
-import feature.news.data.model.ArticleResponse
+import feature.news.data.model.response.ArticleResponse
 import feature.news.data.testhelper.FakeNewsLocalDataSource
 import feature.news.data.testhelper.FakeNewsRemoteDataSource
 import kotlinx.coroutines.test.runTest

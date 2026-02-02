@@ -1,30 +1,26 @@
-package feature.news.data.testhelper
+package feature.news.data.datasource.local
 
 import feature.news.data.datasource.NewsDataSource
+import feature.news.data.dao.NewsDao
 import feature.news.data.model.entity.ArticleEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
-class FakeNewsLocalDataSource : NewsDataSource.Local {
-    
-    val savedArticles = mutableListOf<ArticleEntity>()
-    var count = 0
-
+class NewsLocalDataSourceImpl(
+    private val newsDao: NewsDao
+) : NewsDataSource.Local {
     override fun getAllArticles(): Flow<List<ArticleEntity>> {
-        return flowOf(savedArticles)
+        return newsDao.getAllArticles()
     }
 
     override fun getArticleCount(): Flow<Int> {
-        return flowOf(count)
+        return newsDao.getArticleCount()
     }
 
     override suspend fun upsertArticles(articles: List<ArticleEntity>) {
-        savedArticles.addAll(articles)
-        count += articles.size
+        newsDao.upsertArticles(articles)
     }
 
     override suspend fun clearArticles() {
-        savedArticles.clear()
-        count = 0
+        newsDao.clearArticles()
     }
 }

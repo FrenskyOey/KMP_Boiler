@@ -1,6 +1,5 @@
 package feature.news.domain.usecase
 
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test

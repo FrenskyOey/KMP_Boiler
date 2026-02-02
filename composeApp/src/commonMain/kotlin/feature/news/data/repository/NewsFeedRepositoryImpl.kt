@@ -2,18 +2,17 @@ package feature.news.data.repository
 
 import core.data.remote.util.ApiErrorHandler
 import core.domain.model.Result
-import feature.news.data.local.NewsLocalDataSource
-import feature.news.data.mapper.toDomain
-import feature.news.data.mapper.toEntity
-import feature.news.data.remote.NewsRemoteDataSource
+import feature.news.data.datasource.NewsDataSource
+import feature.news.data.model.mapper.toDomain
+import feature.news.data.model.mapper.toEntity
 import feature.news.domain.model.Article
 import feature.news.domain.repository.NewsFeedRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class NewsFeedRepositoryImpl(
-    private val remoteDataSource: NewsRemoteDataSource,
-    private val localDataSource: NewsLocalDataSource
+    private val remoteDataSource: NewsDataSource.Remote,
+    private val localDataSource: NewsDataSource.Local
 ) : NewsFeedRepository {
 
     override fun getArticles(page: Int): Flow<Result<List<Article>>> = flow {

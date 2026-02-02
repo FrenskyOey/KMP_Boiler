@@ -1,9 +1,9 @@
 package feature.news.data.testhelper
 
-import feature.news.data.model.ArticleResponse
-import feature.news.data.remote.NewsRemoteDataSource
+import feature.news.data.datasource.NewsDataSource
+import feature.news.data.model.response.ArticleResponse
 
-class FakeNewsRemoteDataSource : NewsRemoteDataSource {
+class FakeNewsRemoteDataSource : NewsDataSource.Remote {
 
     var shouldReturnError = false
     var mockArticles: List<ArticleResponse> = emptyList()

@@ -5,12 +5,14 @@ import androidx.room.RoomDatabase
 
 import androidx.room.ConstructedBy
 import androidx.room.RoomDatabaseConstructor
+import feature.news.data.dao.NewsDao
+import feature.news.data.model.entity.ArticleEntity
 
 // Placeholder for now. We will add entities later.
-@Database(entities = [feature.news.data.local.entity.ArticleEntity::class], version = 1)
+@Database(entities = [ArticleEntity::class], version = 1)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun newsDao(): feature.news.data.local.NewsDao
+    abstract fun newsDao(): NewsDao
 }
 
 // Function to serve as a factory or similar if needed, or expected by DI
