@@ -9,6 +9,8 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(17)
+    
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -23,6 +25,12 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
+        }
+    }
+    
+    jvm("desktop") {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
     
@@ -74,6 +82,13 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
+        
+        val desktopMain by getting {
+            dependencies {
+                implementation(libs.ktor.client.android) // Using Android client for JVM
+                implementation(libs.kotlinx.coroutines.swing) // Main dispatcher for desktop
+            }
+        }
     }
 }
 
@@ -111,4 +126,5 @@ dependencies {
     add("kspIosX64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    add("kspDesktop", libs.androidx.room.compiler)
 }
