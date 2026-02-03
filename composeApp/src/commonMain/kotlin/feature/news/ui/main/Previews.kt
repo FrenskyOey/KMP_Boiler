@@ -3,9 +3,9 @@ package feature.news.ui.main
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import feature.news.domain.model.Article
-import feature.news.ui.main.composable.NewsEmptyWidget
-import feature.news.ui.main.composable.NewsErrorWidget
-import feature.news.ui.main.composable.NewsItemWidget
+import feature.news.ui.main.components.NewsEmptyWidget
+import feature.news.ui.main.components.NewsErrorWidget
+import feature.news.ui.main.components.NewsItemWidget
 import feature.settings.ui.main.SettingScreen
 
 // Preview for ArticleItem with sample data

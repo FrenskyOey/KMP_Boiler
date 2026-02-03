@@ -1,4 +1,5 @@
 ---
+trigger: always_on
 description: Testing guidelines and code review checklist
 ---
 
@@ -8,7 +9,7 @@ description: Testing guidelines and code review checklist
 
 ```kotlin
 // Tests mirror the source structure
-shared/src/commonTest/kotlin/
+composeApp/src/commonTest/kotlin/
 ├── core/
 │   └── data/
 │       └── util/
@@ -17,14 +18,18 @@ shared/src/commonTest/kotlin/
     ├── news/
     │   ├── domain/
     │   │   └── usecase/
-    │       └── GetNewsFeedUseCaseTest.kt
+    │              └── GetNewsFeedUseCaseTest.kt
     │   └── data/
     │       └── repository/
     │           └── NewsFeedRepositoryImplTest.kt
-    └── settings/
+    │       └── datasource/
+    │           └──local
+    │           |     └── NewsLocalDataSourceImpl.kt
+    │           └──remote
+    │                 └── NewsRemoteDataSourceImpl.kt
+    └── ...../
         └── domain/
-        └── usecase/
-            └── GetSettingsUseCaseTest.kt
+        └── data/
 ```
 
 ## Test Isolation
@@ -68,13 +73,10 @@ Before accepting code, verify:
 - [ ] Has proper state management
 - [ ] Follows Kotlin coding conventions
 - [ ] No hardcoded values
-- [ ] **No hardcoded URLs - uses AppConfig**
-- [ ] **All API services inject AppConfig**
 - [ ] Uses theme helpers
 - [ ] Has appropriate documentation
 
 ### Feature Isolation:
 - [ ] No imports from other features
-- [ ] All dependencies injected via Koin
 - [ ] Can be removed without breaking other features
 - [ ] Has its own tests

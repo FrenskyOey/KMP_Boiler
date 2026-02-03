@@ -21,6 +21,12 @@ description: Naming conventions, file rules, and error handling
 - Entities: `[Entity]Entity.kt`
 - Modules: `[Feature]Module.kt`
 
+**Data Layer (feature/data):**
+- API Interface: `[Feature]ApiService.kt` (e.g., `NewsApiService`)
+- DAO Interface: `[Feature]Dao.kt` (e.g., `NewsDao`)
+- Data Source Interface: `[Feature][SourceType]DataSource.kt` (e.g., `NewsRemoteDataSource`)
+- Data Source Implementation: `[Feature][SourceType]DataSourceImpl.kt` (e.g., `NewsRemoteDataSourceImpl`)
+
 ## File Location Rules
 
 ```kotlin

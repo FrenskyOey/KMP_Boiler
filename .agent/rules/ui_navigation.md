@@ -2,29 +2,38 @@
 description: UI organization and navigation rules
 ---
 
-# Android UI Organization
+# KMP UI Organization
 
 ## Feature-Based UI Structure
 
 ```kotlin
-composeApp/src/main/kotlin/
+composeApp/src/commonMain/kotlin/
 ├── core/
 │   ├── theme/                 # Shared theme
 │   ├── navigation/            # Navigation setup
 │   └── components/            # Shared components
 └── feature/
     ├── news/
-    │   ├── list/
-    │   │   ├── NewsFeedScreen.kt
-    │   │   ├── NewsFeedViewModel.kt
-    │   │   └── components/
-    │   └── detail/
-    │       ├── NewsDetailScreen.kt
-    │       └── NewsDetailViewModel.kt
+    │   ├── data/
+    │   ├── domain/
+    │   ├── di/
+    │   └── ui/
+    │       ├── main/
+    │       │   ├── NewsScreen.kt
+    │       │   ├── NewsFeedViewModel.kt
+    │       │   └── components/
+    │       └── detail/
+    │           ├── NewsDetailScreen.kt
+    │           └── NewsDetailViewModel.kt
     └── settings/
-        ├── SettingsScreen.kt
-        ├── SettingsViewModel.kt
-        └── components/
+        ├── data/
+        ├── domain/
+        ├── di/
+        └── ui/
+            └── main/
+                ├── SettingScreen.kt
+                ├── SettingsViewModel.kt
+                └── components/
 ```
 
 ## UI Rules
@@ -50,7 +59,7 @@ class NewsFeedViewModel(
 NavHost(navController, startDestination = Screen.NewsFeedList.route) {
     // News feature screens
     composable(Screen.NewsFeedList.route) {
-        NewsFeedScreen(
+        NewsScreen(
             onNewsItemClick = { id -> navController.navigate(Screen.NewsDetail.createRoute(id)) },
             onSettingsClick = { navController.navigate(Screen.Settings.route) }
         )
@@ -58,7 +67,7 @@ NavHost(navController, startDestination = Screen.NewsFeedList.route) {
     
     // Settings feature screens
     composable(Screen.Settings.route) {
-        SettingsScreen(
+        SettingScreen(
             onBackClick = { navController.popBackStack() }
         )
     }

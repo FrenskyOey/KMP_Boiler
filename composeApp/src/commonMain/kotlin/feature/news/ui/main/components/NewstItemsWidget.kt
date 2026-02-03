@@ -1,4 +1,4 @@
-package feature.news.ui.main.composable
+package feature.news.ui.main.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

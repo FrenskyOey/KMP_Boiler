@@ -20,9 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import feature.news.ui.main.composable.NewsEmptyWidget
-import feature.news.ui.main.composable.NewsErrorWidget
-import feature.news.ui.main.composable.NewsItemWidget
+import feature.news.ui.main.components.NewsEmptyWidget
+import feature.news.ui.main.components.NewsErrorWidget
+import feature.news.ui.main.components.NewsItemWidget
 import feature.news.ui.main.state.NewsEffect
 import feature.news.ui.main.state.NewsIntent
 import org.koin.compose.viewmodel.koinViewModel

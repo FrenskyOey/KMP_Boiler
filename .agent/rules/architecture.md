@@ -5,12 +5,12 @@ description: High-level architectural rules and cross-feature boundaries
 # Feature-First Architecture Rules
 
 ## Project Context
-This is a Kotlin Multiplatform (KMP) project with **Feature-First Modular Architecture**. Each feature is self-contained with its own data, domain, and DI layers.
+This is a Kotlin Multiplatform (KMP) project with **Feature-First Modular Architecture**. Even though code resides in a single module (`composeApp`), we maintain strict logical boundaries between features.
 
 ## Feature Structure
 ```
-shared/src/commonMain/kotlin/
-├── core/               # Shared utilities ONLY
+composeApp/src/commonMain/kotlin/
+├── core/               # Shared utilities & Infrastructure
 │   ├── data/
 │   ├── domain/
 │   ├── di/
@@ -20,52 +20,54 @@ shared/src/commonMain/kotlin/
     │   ├── data/
     │   ├── domain/
     │   ├── di/
+    │   └── ui/         # Presentation Layer
     └── settings/
         ├── data/
         ├── domain/
-        └── di/
+        ├── di/
+        └── ui/
 ```
 
 ## CRITICAL Dependency Rules
 
 **✅ ALLOWED:**
-- Features can depend on `core/`
+- Features can always depend on `core/`
+- features/ui can depend on feature/domain
+- features/data can depend on feature/domain
 - Features can depend on external libraries
-- UI layer can depend on any feature
+- UI layer can depend on any feature (via Navigation)
 
 **❌ FORBIDDEN:**
-- Features CANNOT depend on other features
-- Features CANNOT import from other features
-- Features CANNOT share code directly
+- Features CANNOT depend on other features' internal implementation
+- Features CANNOT import from other features' `data` or `ui` packages directly
+- `domain` layer CANNOT depend on `ui` or `data`
 
 **Example:**
 ```kotlin
 // ✅ CORRECT - Feature depends on core
-import com.example.core.domain.model.Result
-import com.example.feature.news.domain.model.NewsFeed
+import core.domain.model.Result
+import feature.news.domain.model.NewsFeed
 
-// ❌ WRONG - Feature depends on another feature
-import com.example.feature.settings.domain.model.AppSettings // NO!
+// ❌ WRONG - Feature depends on another feature's implementation details
+import feature.settings.data.repository.SettingsRepositoryImpl // NO!
 ```
 
-## When Features Need to Communicate
+## Cross-Feature Communication
 
-If features need to share data or communicate:
+Since all code is in `commonMain`, it is physically possible to import anything. **Discipline is required.**
 
 **Option 1: Move to Core**
+If a model or logic is truly shared by multiple features, it belongs in `core`.
 ```kotlin
-// If multiple features need it, move to core/domain/model/
-core/domain/model/User.kt
+// core/domain/model/User.kt
 ```
 
-**Option 2: Use Events/Messages**
-```kotlin
-// Create event bus in core
-core/domain/event/AppEvent.kt
-```
+**Option 2: Shared Interfaces in Core**
+Define an interface in `core` that one feature implements and another uses.
 
-**Option 3: Through UI/Navigation**
+**Option 3: Navigation with Arguments**
+Pass primitive data or simple DTOs via navigation routes.
 ```kotlin
 // Features communicate through navigation with results
-navController.previousBackStackEntry?.savedStateHandle?.set("result", data)
+navController.navigate(Screen.Detail.createRoute(id))
 ```

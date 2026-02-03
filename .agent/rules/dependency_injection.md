@@ -6,50 +6,64 @@ description: Dependency injection setup and rules using Koin
 
 ## Feature Modules
 
+In KMP, feature modules are defined in `commonMain` and can use `factoryOf`, `singleOf` for conciseness.
+
 ```kotlin
-// ✅ CORRECT - One module per feature
+// compostApp/src/commonMain/kotlin/feature/news/di/NewsModule.kt
+
 val newsModule = module {
     // API
-    single<NewsApiService> { NewsApiServiceImpl(get(), get(), get()) }
+    single<NewsApiService> { NewsApiServiceImpl(get()) }
     
     // DAO
     single { get<AppDatabase>().newsFeedDao() }
     
     // Repository
-    single<NewsFeedRepository> { NewsFeedRepositoryImpl(get(), get(), get()) }
+    single<NewsFeedRepository> { NewsFeedRepositoryImpl(get(), get()) }
     
     // Use Cases
     factory { GetNewsFeedUseCase(get()) }
-    factory { GetNewsDetailUseCase(get()) }
-}
-
-// ❌ WRONG - Multiple features in one module
-val sharedModule = module {
-    single<NewsApiService> { NewsApiServiceImpl(get()) }
-    single<SettingsRepository> { SettingsRepositoryImpl(get()) }
+    
+    // ViewModels (in appModule or feature module)
+    // factoryOf(::NewsFeedViewModel) 
 }
 ```
 
-## Module Organization
+## Module Organization & Initialization
+
+The project uses platform-specific entry points to initialize Koin with a shared list of modules.
+
+### Shared Module List
+The modules are typically aggregated in the initialization block or a shared variable.
+
+Common Modules:
+- `coreNetworkModule`
+- `coreDatabaseModule`
+- `corePreferencesModule`
+- `coreConfigModule`
+- `newsModule`
+- `settingsModule`
+- `appModule` (ViewModels)
+
+### Android Initialization (`MyApp.kt`)
 
 ```kotlin
-// Application initialization
 class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
             androidContext(this@MyApp)
             modules(
-                // Core modules first
                 coreNetworkModule,
                 coreDatabaseModule,
                 corePreferencesModule,
+                coreConfigModule, // App Config
                 
-                // Feature modules
+                // Features
                 newsModule,
                 settingsModule,
                 
-                // App module last
+                // Main App
                 appModule
             )
         }
@@ -57,29 +71,35 @@ class MyApp : Application() {
 }
 ```
 
-## iOS Koin Initialization
+### iOS Initialization (`KoinHelper.kt`)
 
-**CRITICAL:** iOS apps must call `initKoin()` before any UI is created.
+**CRITICAL:** iOS apps must call `doInitKoin()` (or similar helper) from Swift before any UI is created.
 
 ```kotlin
-// ✅ CORRECT - KoinHelper.kt (composeApp/iosMain)
-fun initKoin() {
+// composeApp/src/iosMain/kotlin/com/interview/prep/kmp_learn/KoinHelper.kt
+fun doInitKoin() {
     startKoin {
         modules(
-            coreConfigModule,      // Include config module
             coreNetworkModule,
-            // ... other modules
+            coreDatabaseModule,
+            corePreferencesModule,
+            coreConfigModule,
+            newsModule,
+            settingsModule,
+            appModule
         )
     }
 }
+```
 
-// iOSApp.swift
+```swift
+// iosApp/iosApp/iOSApp.swift
 import ComposeApp
 
 @main
 struct iOSApp: App {
     init() {
-        KoinHelperKt.initKoin()  // MUST call before UI
+        KoinHelperKt.doInitKoin()  // MUST call before UI
     }
     
     var body: some Scene {
