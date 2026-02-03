@@ -2,10 +2,21 @@ package feature.settings.ui.main
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import feature.settings.ui.text.TextScreen
 
 // Preview for SettingScreen with sample data
 @Preview
 @Composable
 fun PreviewSettingScreen() {
-    SettingScreen()
+    core.theme.AppTheme {
+        SettingScreen()
+    }
+}
+
+@Preview
+@Composable
+fun PreviewTextScreen() {
+    core.theme.AppTheme {
+        TextScreen()
+    }
 }

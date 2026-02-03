@@ -18,8 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import core.theme.getOnPrimaryColor
+import core.theme.getSurfaceColor
 import feature.news.ui.main.NewsScreen
-import feature.settings.ui.main.SettingScreen
+import feature.settings.navigation.SettingsNavGraph
 
 @Composable
 fun DashboardScreen(
@@ -32,7 +34,9 @@ fun DashboardScreen(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = getOnPrimaryColor()
+            ) {
                 NavigationBarItem(
                     selected = selectedTab == NewsTab.News,
                     onClick = { selectedTab = NewsTab.News },
@@ -55,7 +59,7 @@ fun DashboardScreen(
                         snackbarHostState.showSnackbar(message)
                     }
                 )
-                NewsTab.Settings -> SettingScreen()
+                NewsTab.Settings -> SettingsNavGraph()
             }
         }
     }
