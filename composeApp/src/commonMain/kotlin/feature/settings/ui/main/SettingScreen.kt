@@ -25,9 +25,12 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import core.components.CoreBasicAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import core.theme.Dimens
 import core.theme.getOnPrimaryColor
+import feature.settings.ui.SettingsAction
 
 data class SettingItem(
     val title: String,
@@ -45,78 +49,65 @@ data class SettingItem(
     val onClick: () -> Unit
 )
 
+@Suppress("SuspiciousIndentation")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
-    onColorClick: () -> Unit = {},
-    onTextClick: () -> Unit = {},
-    onButtonClick: () -> Unit = {},
-    onFormClick: () -> Unit = {},
-    onNavBarClick: () -> Unit = {}
+    onAction: (SettingsAction) -> Unit
 ) {
     val settingsItems = listOf(
         SettingItem(
             title = "Color Schema",
             subtitle = "Dynamic colors and tokens",
             icon = Icons.Default.Palette,
-            onClick = onColorClick
+            onClick = { onAction(SettingsAction.OpenColor) }
         ),
         SettingItem(
             title = "Typography",
             subtitle = "Scales and fonts",
             icon = Icons.Default.TextFields,
-            onClick = onTextClick
+            onClick = { onAction(SettingsAction.OpenText) }
         ),
         SettingItem(
             title = "Buttons",
             subtitle = "FABs, filled, and outlined",
             icon = Icons.Default.SmartButton,
-            onClick = onButtonClick
+            onClick = { onAction(SettingsAction.OpenButtons) }
         ),
         SettingItem(
             title = "Form Inputs",
             subtitle = "Fields and validation",
             icon = Icons.Default.CommentBank,
-            onClick = onFormClick
+            onClick = { onAction(SettingsAction.OpenForm) }
         ),
         SettingItem(
             title = "App Nav Bar",
             subtitle = "Nav Bar Design",
             icon = Icons.Default.Group,
-            onClick = onNavBarClick
+            onClick = { onAction(SettingsAction.OpenNavBar) }
         )
     )
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = Dimens.M)
-    ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Welcome",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Explore our Material design components.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-            }
 
-            items(settingsItems) { item ->
-                SettingItemCard(item = item)
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+        ) {
+            CoreBasicAppBar(title = "Settings")
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = Dimens.M),
+                verticalArrangement = Arrangement.spacedBy(Dimens.M)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(Dimens.S))
+                }
+
+                items(settingsItems) { item ->
+                    SettingItemCard(item = item)
+                }
             }
         }
-    }
 }
 
 @Composable

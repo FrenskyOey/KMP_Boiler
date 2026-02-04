@@ -1,6 +1,7 @@
 package feature.news.ui.main
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import core.components.CoreBasicAppBar
 import feature.news.ui.main.components.NewsEmptyWidget
 import feature.news.ui.main.components.NewsErrorWidget
 import feature.news.ui.main.components.NewsItemWidget
@@ -47,58 +49,66 @@ fun NewsScreen(
     }
 
     // is refresh is happen when user pull to refresh where the article data should not be empty
-    PullToRefreshBox(
-        isRefreshing = state.isRefresh,
-        onRefresh = { viewModel.onIntent(NewsIntent.Refresh) },
-        modifier = Modifier.fillMaxSize()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        if (state.isLoading && state.error != null && state.articles.isEmpty()) {
-            NewsErrorWidget(
-                message = state.error!!,
-                onRetry = { viewModel.onIntent(NewsIntent.Retry) }
-            )
-        } else if (!state.isLoading && state.articles.isEmpty()) {
-            NewsEmptyWidget()
-        } else {
-            val listState = rememberLazyListState()
+        CoreBasicAppBar(title = "News")
+        PullToRefreshBox(
+            isRefreshing = state.isRefresh,
+            onRefresh = { viewModel.onIntent(NewsIntent.Refresh) },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (state.isLoading && state.error != null && state.articles.isEmpty()) {
+                NewsErrorWidget(
+                    message = state.error!!,
+                    onRetry = { viewModel.onIntent(NewsIntent.Retry) }
+                )
+            } else if (!state.isLoading && state.articles.isEmpty()) {
+                NewsEmptyWidget()
+            } else {
+                val listState = rememberLazyListState()
 
-            // Pagination detection
-            val shouldLoadNext = remember {
-                derivedStateOf {
-                    val layoutInfo = listState.layoutInfo
-                    val totalItemsNumber = layoutInfo.totalItemsCount
-                    val lastVisibleItemIndex = (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
+                // Pagination detection
+                val shouldLoadNext = remember {
+                    derivedStateOf {
+                        val layoutInfo = listState.layoutInfo
+                        val totalItemsNumber = layoutInfo.totalItemsCount
+                        val lastVisibleItemIndex =
+                            (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
 
-                    lastVisibleItemIndex > (totalItemsNumber - 2)
+                        lastVisibleItemIndex > (totalItemsNumber - 2)
+                    }
                 }
-            }
 
-            LaunchedEffect(shouldLoadNext.value) {
-                if (shouldLoadNext.value && !state.isLoading && !state.isEndReached) {
-                    viewModel.onIntent(NewsIntent.LoadNextPage)
+                LaunchedEffect(shouldLoadNext.value) {
+                    if (shouldLoadNext.value && !state.isLoading && !state.isEndReached) {
+                        viewModel.onIntent(NewsIntent.LoadNextPage)
+                    }
                 }
-            }
-            
-            LazyColumn(
-                state = listState,
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                itemsIndexed(state.articles, key = { index, _ -> index }) { _, article ->
-                    NewsItemWidget(
-                        article = article,
-                        onClick = { /* Handle click if needed */ }
-                    )
-                }
-                
-                if (state.isLoading && !state.articles.isEmpty()) {
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
+
+                LazyColumn(
+                    state = listState,
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    itemsIndexed(state.articles, key = { index, _ -> index }) { _, article ->
+                        NewsItemWidget(
+                            article = article,
+                            onClick = { /* Handle click if needed */ }
+                        )
+                    }
+
+                    if (state.isLoading && !state.articles.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
                         }
                     }
                 }

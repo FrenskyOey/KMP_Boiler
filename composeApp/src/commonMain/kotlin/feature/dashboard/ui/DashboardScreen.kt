@@ -1,6 +1,7 @@
 package feature.dashboard.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -16,23 +17,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import core.theme.getOnPrimaryColor
-import core.theme.getSurfaceColor
 import feature.news.ui.main.NewsScreen
-import feature.settings.navigation.SettingsNavGraph
+import feature.settings.ui.SettingsAction
+import feature.settings.ui.main.SettingScreen
 
 @Composable
 fun DashboardScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSettingsAction: (SettingsAction) -> Unit
 ) {
-    var selectedTab by remember { mutableStateOf(NewsTab.News) }
+    var selectedTab by rememberSaveable { mutableStateOf(NewsTab.News) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        contentWindowInsets =  WindowInsets(0.dp),
         bottomBar = {
             NavigationBar(
                 containerColor = getOnPrimaryColor()
@@ -59,7 +64,9 @@ fun DashboardScreen(
                         snackbarHostState.showSnackbar(message)
                     }
                 )
-                NewsTab.Settings -> SettingsNavGraph()
+                NewsTab.Settings -> SettingScreen(
+                    onAction = onSettingsAction
+                )
             }
         }
     }

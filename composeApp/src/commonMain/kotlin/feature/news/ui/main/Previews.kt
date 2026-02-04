@@ -55,10 +55,3 @@ fun PreviewErrorState() {
         onRetry = {}
     )
 }
-
-// Preview for UnderMaintenanceScreen
-@Preview
-@Composable
-fun PreviewUnderMaintenanceScreen() {
-    SettingScreen()
-}

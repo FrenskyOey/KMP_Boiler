@@ -15,6 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import core.components.CoreBackStackAppBar
+import core.theme.Dimens
 import core.theme.Spacing
 import core.theme.getOnBackgroundColor
 import core.theme.getOnPrimaryColor
@@ -31,36 +33,20 @@ fun TextScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Text Schema",
-                        style = getTextHeadlineSmall().copy(fontWeight = FontWeight.Bold)
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = getSurfaceColor(),
-                    titleContentColor = getOnBackgroundColor(),
-                    navigationIconContentColor = getOnBackgroundColor()
-                )
+            CoreBackStackAppBar(
+                title = "Text Schema",
+                onBackPress = onBackClick
             )
         },
         containerColor = getSurfaceColor()
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .padding(innerPadding)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(Spacing.Medium),
-            verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+                .padding(horizontal = Dimens.M)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(Spacing.Small)
         ) {
             SectionHeader("Display")
             TypographyItem("DISPLAY LARGE", MaterialTheme.typography.displayLarge)

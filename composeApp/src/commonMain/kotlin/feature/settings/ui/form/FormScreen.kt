@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import core.components.CoreBackStackAppBar
 import core.components.CUsernameInput
 import core.components.CoreCheckbox
 import core.components.CoreDatePickerInput
@@ -21,6 +22,7 @@ import core.components.CorePhoneInput
 import core.components.CoreRadioButtonGroup
 import core.components.CoreSearchInput
 import core.components.CoreTimePickerInput
+import core.theme.Dimens
 import core.theme.Spacing
 import core.theme.getOnBackgroundColor
 import core.theme.getSurfaceColor
@@ -34,36 +36,20 @@ fun FormScreen(modifier : Modifier = Modifier,
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Form Input Style",
-                        style = getTextHeadlineSmall().copy(fontWeight = FontWeight.Bold)
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = getSurfaceColor(),
-                    titleContentColor = getOnBackgroundColor(),
-                    navigationIconContentColor = getOnBackgroundColor()
-                )
+            CoreBackStackAppBar(
+                title = "Form Input Style",
+                onBackPress = onBackClick
             )
         },
         containerColor = getSurfaceColor()
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .padding(innerPadding)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(Spacing.Medium),
-            verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+                .padding(horizontal = Dimens.M)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(Spacing.Small)
         ) {
             // Header
             Text(

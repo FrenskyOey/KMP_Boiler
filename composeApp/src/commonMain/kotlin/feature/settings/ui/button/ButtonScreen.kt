@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import core.components.CoreBackStackAppBar
 import core.components.CoreButton
 import core.components.CoreExtendedFloatingActionButton
 import core.components.CoreFloatingActionButton
@@ -23,6 +24,7 @@ import core.components.CoreSegmentedButtonGroup
 import core.components.CoreSmallFloatingActionButton
 import core.components.CoreTextButton
 import core.components.CoreTonalButton
+import core.theme.Dimens
 import core.theme.Spacing
 import core.theme.getOnBackgroundColor
 import core.theme.getSurfaceColor
@@ -37,34 +39,18 @@ fun ButtonScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Button Style",
-                        style = getTextHeadlineSmall().copy(fontWeight = FontWeight.Bold)
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = getSurfaceColor(),
-                    titleContentColor = getOnBackgroundColor(),
-                    navigationIconContentColor = getOnBackgroundColor()
-                )
+            CoreBackStackAppBar(
+                title = "Button Style",
+                onBackPress = onBackClick
             )
         },
         containerColor = getSurfaceColor()
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .padding(innerPadding)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = Dimens.M)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Spacing.Large)
         ) {

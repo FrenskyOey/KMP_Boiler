@@ -1,6 +1,7 @@
 package core.components
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,8 +21,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import core.theme.ComponentDimens
+import core.theme.getOnBackgroundColor
+import core.theme.getSurfaceColor
+import core.theme.getSurfaceVariantColor
 import core.theme.getTextTitleLarge
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CoreTopBarColor() : TopAppBarColors{
+    return TopAppBarDefaults.topAppBarColors(
+        containerColor = getSurfaceVariantColor(),
+        titleContentColor = getOnBackgroundColor(),
+        navigationIconContentColor = getOnBackgroundColor()
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +47,7 @@ fun CoreTopAppBar(
     onNavigationClick: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     centerTitle: Boolean = true,
-    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+    colors : TopAppBarColors = CoreTopBarColor(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     if (centerTitle) {
@@ -59,7 +74,11 @@ fun CoreTopAppBar(
             },
             actions = actions,
             colors = colors,
-            scrollBehavior = scrollBehavior
+            scrollBehavior = scrollBehavior,
+            /*windowInsets = WindowInsets(
+                top = 0.dp,
+                bottom = 0.dp
+            ),*/
         )
     } else {
         TopAppBar(
@@ -85,7 +104,11 @@ fun CoreTopAppBar(
             },
             actions = actions,
             colors = colors,
-            scrollBehavior = scrollBehavior
+            scrollBehavior = scrollBehavior,
+            /*windowInsets = WindowInsets(
+                top = 0.dp,
+                bottom = 0.dp
+            ),*/
         )
     }
 }
@@ -97,15 +120,15 @@ fun CoreBasicAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: ImageVector? = null,
     onNavigationClick: (() -> Unit)? = null,
-    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+    colors : TopAppBarColors = CoreTopBarColor(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     CoreTopAppBar(
         title = title,
         modifier = modifier,
-        colors = colors,
         navigationIcon = navigationIcon,
         onNavigationClick = onNavigationClick,
+        colors = colors,
         scrollBehavior = scrollBehavior
     )
 }
@@ -117,7 +140,7 @@ fun CoreBackStackAppBar(
     onBackPress: () -> Unit,
     modifier: Modifier = Modifier,
     navigationIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack,
-    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+    colors : TopAppBarColors = CoreTopBarColor(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     CoreTopAppBar(
@@ -136,7 +159,7 @@ fun CoreSearchTopAppBar(
     title: String,
     onSearchClick: () -> Unit,
     modifier: Modifier = Modifier,
-    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+    colors : TopAppBarColors = CoreTopBarColor(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     CoreTopAppBar(
@@ -192,7 +215,7 @@ fun CoreContentTopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: ImageVector? = null,
     onNavigationClick: (() -> Unit)? = null,
-    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+    colors : TopAppBarColors = CoreTopBarColor(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(

@@ -20,6 +20,8 @@ import core.theme.LightColorScheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import core.theme.Spacing
+import core.components.CoreBackStackAppBar
+import core.theme.Dimens
 import core.theme.getTextHeadlineSmall
 import core.theme.getTextTitleMedium
 
@@ -48,37 +50,22 @@ fun ColorScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Color Scheme", 
-                        style = getTextHeadlineSmall().copy(fontWeight = FontWeight.Bold)
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                   containerColor = backgroundColor,
-                   titleContentColor = onBackgroundColor,
-                   navigationIconContentColor = onBackgroundColor
-                )
+            CoreBackStackAppBar(
+                title = "Color Schemaa",
+                onBackPress = onBackClick
             )
         },
         containerColor = backgroundColor
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .padding(innerPadding)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = Dimens.M)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+            verticalArrangement = Arrangement.spacedBy(Spacing.Small)
         ) {
+            Spacer(modifier = Modifier.height(4.dp))
             // Toggle
             ThemeToggle(
                 isDark = isDarkTheme, 
@@ -89,9 +76,8 @@ fun ColorScreen(
                 onInactiveColor = currentScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-            // Primary
             ColorGroupTitle("Primary", onBackgroundColor)
             ColorGrid(
                 items = listOf(
@@ -102,7 +88,7 @@ fun ColorScreen(
                 )
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Secondary
             ColorGroupTitle("Secondary", onBackgroundColor)
@@ -115,7 +101,7 @@ fun ColorScreen(
                 )
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Tertiary
             ColorGroupTitle("Tertiary", onBackgroundColor)
@@ -133,7 +119,7 @@ fun ColorScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Surface
             ColorGroupTitle("Surface", onBackgroundColor)
@@ -150,7 +136,7 @@ fun ColorScreen(
                 )
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Error
             ColorGroupTitle("Error", onBackgroundColor)

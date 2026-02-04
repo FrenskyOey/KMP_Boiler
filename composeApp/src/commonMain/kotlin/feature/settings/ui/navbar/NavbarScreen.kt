@@ -15,27 +15,19 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import core.components.CoreAppBarAction
 import core.components.CoreBackStackAppBar
 import core.components.CoreBasicAppBar
 import core.components.CoreTopAppBar
 import core.theme.Dimens
 import core.theme.Spacing
-import core.theme.getOnBackgroundColor
 import core.theme.getSurfaceColor
-import core.theme.getTextHeadlineSmall
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,42 +36,26 @@ fun NavbarScreen(modifier : Modifier = Modifier,
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Nav Bar",
-                        style = getTextHeadlineSmall().copy(fontWeight = FontWeight.Bold)
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = getSurfaceColor(),
-                    titleContentColor = getOnBackgroundColor(),
-                    navigationIconContentColor = getOnBackgroundColor()
-                )
+            CoreBackStackAppBar(
+                title = "Nav Bar",
+                onBackPress = onBackClick
             )
         },
         containerColor = getSurfaceColor()
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(innerPadding)
+                .fillMaxSize()
                 .padding(horizontal = Dimens.M)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Dimens.M)
+            verticalArrangement = Arrangement.spacedBy(Spacing.Small)
             ) {
                 // Header
+                Spacer(modifier = modifier.height(Dimens.M))
                 Text(
                     text = "Updated App Bar Showcase",
-                    style = MaterialTheme.typography.displaySmall
+                    style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
                     text = "Material Design 3 App Bar Variants",
@@ -168,14 +144,6 @@ private fun AppBarVariantSection(
                 )
             }
         }
-
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 1.dp,
-            shape = MaterialTheme.shapes.medium
-        ) {
-            content()
-        }
+        content()
     }
 }

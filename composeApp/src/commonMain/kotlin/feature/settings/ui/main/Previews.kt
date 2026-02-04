@@ -9,7 +9,9 @@ import feature.settings.ui.text.TextScreen
 @Composable
 fun PreviewSettingScreen() {
     core.theme.AppTheme {
-        SettingScreen()
+        SettingScreen(){
+
+        }
     }
 }
 
