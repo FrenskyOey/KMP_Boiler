@@ -52,6 +52,7 @@ fun FormScreen(modifier : Modifier = Modifier,
             verticalArrangement = Arrangement.spacedBy(Spacing.Small)
         ) {
             // Header
+            Spacer(modifier = Modifier.height(Spacing.Tiny))
             Text(
                 text = "Form Components",
                 style = MaterialTheme.typography.displaySmall

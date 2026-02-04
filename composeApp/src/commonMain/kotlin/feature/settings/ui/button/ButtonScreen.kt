@@ -52,24 +52,25 @@ fun ButtonScreen(
                 .fillMaxSize()
                 .padding(horizontal = Dimens.M)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Spacing.Large)
+            verticalArrangement = Arrangement.spacedBy(Spacing.Medium)
         ) {
 
             // Segmented Buttons Section
+            Spacer(modifier = Modifier.height(Spacing.Small))
             SegmentedButtonsSection()
-            Spacer(modifier = Modifier.height(Spacing.Tiny))
+            Spacer(modifier = Modifier.height(Spacing.Small))
             // Filled Buttons Section
             FilledButtonsSection()
-            Spacer(modifier = Modifier.height(Spacing.Tiny))
+            Spacer(modifier = Modifier.height(Spacing.Small))
             // Tonal Buttons Section
             TonalButtonsSection()
-            Spacer(modifier = Modifier.height(Spacing.Tiny))
+            Spacer(modifier = Modifier.height(Spacing.Small))
             // Outlined Buttons Section
             OutlinedButtonsSection()
-            Spacer(modifier = Modifier.height(Spacing.Tiny))
+            Spacer(modifier = Modifier.height(Spacing.Small))
             // Text Buttons Section
             TextButtonsSection()
-            Spacer(modifier = Modifier.height(Spacing.Tiny))
+            Spacer(modifier = Modifier.height(Spacing.Small))
             // FAB Variants Section
             FABVariantsSection()
         }
