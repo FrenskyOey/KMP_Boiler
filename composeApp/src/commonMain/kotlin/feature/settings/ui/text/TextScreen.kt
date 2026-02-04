@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import core.theme.Spacing
 import core.theme.getOnBackgroundColor
 import core.theme.getOnPrimaryColor
 import core.theme.getPrimaryColor
@@ -56,10 +57,10 @@ fun TextScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 16.dp)
+                .padding(Spacing.Medium),
+            verticalArrangement = Arrangement.spacedBy(Spacing.Large)
         ) {
             SectionHeader("Display")
             TypographyItem("DISPLAY LARGE", MaterialTheme.typography.displayLarge)

@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.CommentBank
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.SmartButton
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.TextFields
@@ -48,7 +50,9 @@ fun SettingScreen(
     modifier: Modifier = Modifier,
     onColorClick: () -> Unit = {},
     onTextClick: () -> Unit = {},
-    onButtonClick: () -> Unit = {}
+    onButtonClick: () -> Unit = {},
+    onFormClick: () -> Unit = {},
+    onNavBarClick: () -> Unit = {}
 ) {
     val settingsItems = listOf(
         SettingItem(
@@ -68,6 +72,18 @@ fun SettingScreen(
             subtitle = "FABs, filled, and outlined",
             icon = Icons.Default.SmartButton,
             onClick = onButtonClick
+        ),
+        SettingItem(
+            title = "Form Inputs",
+            subtitle = "Fields and validation",
+            icon = Icons.Default.CommentBank,
+            onClick = onFormClick
+        ),
+        SettingItem(
+            title = "App Nav Bar",
+            subtitle = "Nav Bar Design",
+            icon = Icons.Default.Group,
+            onClick = onNavBarClick
         )
     )
 
@@ -89,7 +105,7 @@ fun SettingScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Explore our Material 3 design components.",
+                    text = "Explore our Material design components.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

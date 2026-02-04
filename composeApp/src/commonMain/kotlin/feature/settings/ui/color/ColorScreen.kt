@@ -19,6 +19,7 @@ import core.theme.DarkColorScheme
 import core.theme.LightColorScheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import core.theme.Spacing
 import core.theme.getTextHeadlineSmall
 import core.theme.getTextTitleMedium
 
@@ -73,10 +74,10 @@ fun ColorScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(Spacing.Large)
         ) {
             // Toggle
             ThemeToggle(

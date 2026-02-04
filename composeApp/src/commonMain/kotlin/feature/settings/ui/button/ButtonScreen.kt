@@ -14,14 +14,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import core.components.CButton
-import core.components.CExtendedFloatingActionButton
-import core.components.CFloatingActionButton
-import core.components.COutlinedButton
-import core.components.CSegmentedButtonGroup
-import core.components.CSmallFloatingActionButton
-import core.components.CTextButton
-import core.components.CTonalButton
+import androidx.compose.ui.unit.dp
+import core.components.CoreButton
+import core.components.CoreExtendedFloatingActionButton
+import core.components.CoreFloatingActionButton
+import core.components.CoreOutlinedButton
+import core.components.CoreSegmentedButtonGroup
+import core.components.CoreSmallFloatingActionButton
+import core.components.CoreTextButton
+import core.components.CoreTonalButton
 import core.theme.Spacing
 import core.theme.getOnBackgroundColor
 import core.theme.getSurfaceColor
@@ -62,9 +63,8 @@ fun ButtonScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
-                .padding(Spacing.Medium)
+                .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Spacing.Large)
         ) {
@@ -101,7 +101,7 @@ private fun SegmentedButtonsSection() {
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
         )
 
-        CSegmentedButtonGroup(
+        CoreSegmentedButtonGroup(
             options = listOf("Day", "Week", "Month"),
             selectedOption = selectedPeriod,
             onOptionSelected = { selectedPeriod = it },
@@ -122,19 +122,19 @@ private fun FilledButtonsSection() {
             horizontalArrangement = Arrangement.spacedBy(Spacing.Small),
             modifier = Modifier.fillMaxWidth()
         ) {
-            CButton(
+            CoreButton(
                 text = "Enabled",
                 onClick = { /* Handle click */ }
             )
 
-            CButton(
+            CoreButton(
                 text = "With Icon",
                 onClick = { /* Handle click */ },
                 icon = Icons.Default.Add
             )
         }
 
-        CButton(
+        CoreButton(
             text = "Disabled",
             onClick = { /* Handle click */ },
             enabled = false
@@ -154,12 +154,12 @@ private fun TonalButtonsSection() {
             horizontalArrangement = Arrangement.spacedBy(Spacing.Small),
             modifier = Modifier.fillMaxWidth()
         ) {
-            CTonalButton(
+            CoreTonalButton(
                 text = "Enabled",
                 onClick = { /* Handle click */ }
             )
 
-            CTonalButton(
+            CoreTonalButton(
                 text = "Icon",
                 onClick = { /* Handle click */ },
                 icon = Icons.Default.Star
@@ -180,12 +180,12 @@ private fun OutlinedButtonsSection() {
             horizontalArrangement = Arrangement.spacedBy(Spacing.Small),
             modifier = Modifier.fillMaxWidth()
         ) {
-            COutlinedButton(
+            CoreOutlinedButton(
                 text = "Outline",
                 onClick = { /* Handle click */ }
             )
 
-            COutlinedButton(
+            CoreOutlinedButton(
                 text = "Edit",
                 onClick = { /* Handle click */ },
                 icon = Icons.Default.Edit
@@ -206,12 +206,12 @@ private fun TextButtonsSection() {
             horizontalArrangement = Arrangement.spacedBy(Spacing.Small),
             modifier = Modifier.fillMaxWidth()
         ) {
-            CTextButton(
+            CoreTextButton(
                 text = "Cancel",
                 onClick = { /* Handle click */ }
             )
 
-            CTextButton(
+            CoreTextButton(
                 text = "Settings",
                 onClick = { /* Handle click */ },
                 icon = Icons.Default.Settings
@@ -237,7 +237,7 @@ private fun FABVariantsSection() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Spacing.Tiny)
             ) {
-                CSmallFloatingActionButton(
+                CoreSmallFloatingActionButton(
                     icon = Icons.Default.Add,
                     contentDescription = "Add",
                     onClick = { /* Handle click */ }
@@ -253,7 +253,7 @@ private fun FABVariantsSection() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Spacing.Tiny)
             ) {
-                CFloatingActionButton(
+                CoreFloatingActionButton(
                     icon = Icons.Default.Edit,
                     contentDescription = "Edit",
                     onClick = { /* Handle click */ }
@@ -269,7 +269,7 @@ private fun FABVariantsSection() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Spacing.Tiny)
             ) {
-                CExtendedFloatingActionButton(
+                CoreExtendedFloatingActionButton(
                     text = "Compose",
                     icon = Icons.Default.Email,
                     onClick = { /* Handle click */ }

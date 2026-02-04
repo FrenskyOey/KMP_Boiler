@@ -12,7 +12,7 @@ import core.theme.ComponentDimens
 import core.theme.Spacing
 
 @Composable
-fun CButton(
+fun CoreButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -52,7 +52,7 @@ fun CButton(
  * Use this when you need more control over button content
  */
 @Composable
-fun CButton(
+fun CoreButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -82,7 +82,7 @@ fun CButton(
  * Less emphasis than FilledButton
  */
 @Composable
-fun CTonalButton(
+fun CoreTonalButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -117,7 +117,7 @@ fun CTonalButton(
  * Medium emphasis action
  */
 @Composable
-fun COutlinedButton(
+fun CoreOutlinedButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -162,7 +162,7 @@ fun COutlinedButton(
  * Lowest emphasis action
  */
 @Composable
-fun CTextButton(
+fun CoreTextButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -199,7 +199,7 @@ fun CTextButton(
  * Used for toolbar actions and compact spaces
  */
 @Composable
-fun CIconButton(
+fun CoreIconButton(
     icon: ImageVector,
     contentDescription: String?,
     onClick: () -> Unit,
@@ -223,7 +223,7 @@ fun CIconButton(
  * Filled Icon Button - Icon button with filled background
  */
 @Composable
-fun CFilledIconButton(
+fun CoreFilledIconButton(
     icon: ImageVector,
     contentDescription: String?,
     onClick: () -> Unit,
@@ -251,7 +251,7 @@ fun CFilledIconButton(
  * Tonal Icon Button - Icon button with tonal background
  */
 @Composable
-fun CTonalIconButton(
+fun CoreTonalIconButton(
     icon: ImageVector,
     contentDescription: String?,
     onClick: () -> Unit,
@@ -276,7 +276,7 @@ fun CTonalIconButton(
  * Outlined Icon Button - Icon button with border
  */
 @Composable
-fun COutlinedIconButton(
+fun CoreOutlinedIconButton(
     icon: ImageVector,
     contentDescription: String?,
     onClick: () -> Unit,
@@ -305,7 +305,7 @@ fun COutlinedIconButton(
  * Primary action button that floats above content
  */
 @Composable
-fun CSmallFloatingActionButton(
+fun CoreSmallFloatingActionButton(
     icon: ImageVector,
     contentDescription: String?,
     onClick: () -> Unit,
@@ -329,7 +329,7 @@ fun CSmallFloatingActionButton(
  * Floating Action Button - Regular variant
  */
 @Composable
-fun CFloatingActionButton(
+fun CoreFloatingActionButton(
     icon: ImageVector,
     contentDescription: String?,
     onClick: () -> Unit,
@@ -353,7 +353,7 @@ fun CFloatingActionButton(
  * Extended Floating Action Button - FAB with icon and text
  */
 @Composable
-fun CExtendedFloatingActionButton(
+fun CoreExtendedFloatingActionButton(
     text: String,
     icon: ImageVector,
     onClick: () -> Unit,
@@ -387,7 +387,7 @@ fun CExtendedFloatingActionButton(
  * @param modifier Optional modifier
  */
 @Composable
-fun <T> CSegmentedButtonGroup(
+fun <T> CoreSegmentedButtonGroup(
     options: List<T>,
     selectedOption: T,
     onOptionSelected: (T) -> Unit,
