@@ -76,23 +76,181 @@ This workflow uses `// turbo-all` to auto-execute command steps, but requires ma
 
 ## Phase 4: UI Layer Implementation
 
-**Trigger**: User approves `ui-plan.md` (or after Data is done).
+### Phase 4.1: UI Design Specification
+**Trigger**: User approves `ui-overview-plan.md` (or after Data is done).
 
-1. **Implement State/Events**:
-    - Create `State`, `Event`, `Effect` classes in `ui/state/`.
+**Objective**: Create detailed UI specification before any code is written.
+
+1. **UI Requirements Gathering Session**:
+    - **PAUSE & ASK USER**:
+        - What screens/views are needed? (e.g., List Screen, Detail Screen, Edit Form)
+        - What's the primary user flow/journey?
+        - Any reference designs? (sketches, wireframes, apps to mimic)
+        - Design system requirements? (brand colors, spacing rules, typography)
+        - Device considerations? (phone only, tablet layouts, desktop?)
+
+2. **Create Component Inventory**:
+    - List ALL UI components needed for this feature
+    - Categorize each as:
+        - **Reusable** (can be used in multiple places)
+        - **Screen-specific** (only for this feature)
+    - Identify:
+        - ✅ Components that already exist (reuse)
+        - 🆕 Components that need to be created
+
+3. **Create Detailed UI Spec Document**:
+    - Create `composeApp/src/commonMain/kotlin/feature/[name]/ui/ui-spec.md`
+    - Include:
+        - **Screen Layouts**:
+            - ASCII wireframes or detailed descriptions
+            - Layout structure (LazyColumn, Grid, etc.)
+        - **Component Breakdown**:
+            - Each component with:
+                - Purpose
+                - Props/Parameters
+                - States (normal, loading, error, disabled)
+                - User interactions (click, swipe, etc.)
+                - Visual appearance description
+        - **State Management Map**:
+            - Which UI state classes are needed
+            - Which events trigger what
+            - Which ViewModels handle what screens
+        - **Navigation Flow**:
+            - How screens connect
+            - Navigation arguments
+            - Back stack behavior
+        - **Edge Cases**:
+            - Loading states
+            - Empty states
+            - Error states
+            - Offline behavior
+
+4. **Request Review**:
+    - Present the `ui-spec.md` to user
+    - **WAIT** for explicit approval or refinement requests
+    - Allow iteration on design before coding
+
+### Phase 4.2: State & ViewModel Implementation
+**Trigger**: User approves `ui-spec.md`.
+
+**Objective**: Build the state management foundation.
+
+1. **Implement State Classes**:
+    - Create `ui/state/[FeatureName]State.kt` (data class for UI state)
+    - Create `ui/state/[FeatureName]Event.kt` (sealed class for user actions)
+    - Create `ui/state/[FeatureName]Effect.kt` (sealed class for one-time effects)
+
 2. **Implement ViewModel**:
-    - Create ViewModel in `ui/viewmodel/`.
-3. **Implement Components**:
-    - Create reusable Composables in `ui/components/`.
-4. **Implement Screen**:
-    - Create main Screen Composable in `ui/screen/`.
-5. **Setup Navigation & DI**:
-    - Register feature module in Koin.
-    - Add to Navigation graph.
-6. **Verify**:
-    - Compile and check for errors.
+    - Create `ui/viewmodel/[FeatureName]ViewModel.kt`
+    - Implement state management logic
+    - Wire up use cases from domain layer
+    - Handle event processing
+    - Manage side effects
+
+3. **Verify**:
+    - Review ViewModel logic
+    - Ensure all states/events from spec are covered
+
+4. **Request Approval**:
+    - Show user the ViewModel structure
+    - **WAIT** for approval to proceed to components
+
+### Phase 4.3: Component Implementation (Iterative)
+**Trigger**: User approves ViewModel implementation.
+
+**Objective**: Build UI components one-by-one or in logical groups.
+
+**For EACH component** (or logical group of related components):
+
+1. **Announce Component**:
+    - Inform user: "Now implementing: [ComponentName]"
+    - Show component spec from `ui-spec.md`
+
+2. **Implement Component**:
+    - Create file in `ui/components/[ComponentName].kt`
+    - Include:
+        - Component Composable function
+        - Preview functions (for different states)
+        - Internal helper functions if needed
+    - Follow design spec exactly
+
+3. **Show Preview Code**:
+    - Display the component code
+    - Explain key decisions made
+
+4. **Request Approval**:
+    - **WAIT** for user to:
+        - ✅ Approve and move to next component
+        - 🔄 Request changes to current component
+        - 📋 Provide additional design details
+
+5. **Iterate**:
+    - Repeat steps 1-4 for each component in the inventory
+
+**Component Priority Order**:
+- Start with foundational/reusable components (buttons, cards)
+- Then screen-specific components
+- Finally complex composed components
+
+### Phase 4.4: Screen Composition
+**Trigger**: All components are approved.
+
+**Objective**: Assemble components into complete screens.
+
+1. **Implement Screen Composables**:
+    - Create `ui/screen/[ScreenName]Screen.kt` for each screen
+    - Compose approved components together
+    - Wire to ViewModel (state, events)
+    - Handle navigation callbacks
+
+2. **Implement Screen-Level Logic**:
+    - Loading indicators
+    - Error handling UI
+    - Empty state displays
+    - Pull-to-refresh (if applicable)
+    - Dialogs/Bottomsheets
+
+3. **Verify Screens**:
+    - Review each screen implementation
+    - Ensure matches `ui-spec.md`
+
+4. **Request Approval**:
+    - **WAIT** for user to review screen compositions
+    - Allow for layout adjustments
+
+### Phase 4.5: Navigation & Integration
+**Trigger**: All screens are approved.
+
+**Objective**: Wire the feature into the app.
+
+1. **Setup Dependency Injection**:
+    - Create `di/[FeatureName]Module.kt` (if not exists)
+    - Register ViewModel, UseCases, Repositories in Koin
+    - Add module to main Koin configuration
+
+2. **Setup Navigation**:
+    - Add routes to navigation graph (e.g., in `navigation/NavGraph.kt`)
+    - Add navigation arguments if needed
+    - Setup deep links (if applicable)
+    - Wire navigation from other parts of app (if needed)
+
+3. **Integration Points**:
+    - Update any existing screens that link to this feature
+    - Update main menu/navigation drawer/bottom bar (if needed)
+
+4. **Verify Build**:
+    - Compile the project
+    - Check for errors
+    - Verify no broken dependencies
+
+5. **Request Testing**:
+    - Ask user to test the feature
+    - **WAIT** for feedback
 
 ## Completion
-
-- **Final Review**: Ask user to test the feature.
-- **Cleanup**: Mark the feature task as complete.
+- **Final Review**: User tests the complete feature flow
+- **Bug Fixes**: Address any issues found during testing
+- **Cleanup**:
+    - Remove any unused code
+    - Update documentation
+    - Mark the feature task as complete

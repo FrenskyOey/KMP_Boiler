@@ -1,9 +1,9 @@
 ---
-name: android-coroutines
+name: coroutine_skill
 description: Authoritative rules and patterns for production-quality Kotlin Coroutines onto Android. Covers structured concurrency, lifecycle integration, and reactive streams.
 ---
 
-# Android Coroutines Expert Skill
+# Coroutine Skill
 
 This skill provides authoritative rules and patterns for writing production-quality Kotlin Coroutines code on Android. It enforces structured concurrency, lifecycle safety, and modern best practices (2025 standards).
 

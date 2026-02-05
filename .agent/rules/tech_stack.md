@@ -9,6 +9,9 @@ description: Technology stack and library choices
 - **Kotlin Multiplatform**: The backbone of the application, enabling 100% shared logic and UI potential.
 - **Compose Multiplatform**: For declarative UI sharing across platforms.
 
+## Resources
+- **Compose Multiplatform Resources**: Official Jetbrains library for sharing strings, images, and fonts (`composeResources`).
+
 ## Dependency Injection
 - **Koin**: Chosen for its native Kotlin support and ease of use in KMP.
     - `koin-core` for shared logic.
