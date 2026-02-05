@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,6 +35,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsScreen(
+    listState: LazyListState,
     onShowSnackbar: suspend (String) -> Unit,
     viewModel: NewsFeedViewModel = koinViewModel()
 ) {
@@ -68,8 +70,6 @@ fun NewsScreen(
             } else if (!state.isLoading && state.articles.isEmpty()) {
                 NewsEmptyWidget()
             } else {
-                val listState = rememberLazyListState()
-
                 // Pagination detection
                 val shouldLoadNext = remember {
                     derivedStateOf {

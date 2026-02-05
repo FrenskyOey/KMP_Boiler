@@ -3,6 +3,7 @@ package feature.dashboard.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -33,6 +34,7 @@ fun DashboardScreen(
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(NewsTab.News) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val newsListState = rememberLazyListState()
 
     Scaffold(
         modifier = modifier,
@@ -60,6 +62,7 @@ fun DashboardScreen(
         Box(modifier = Modifier.padding(innerPadding)) {
             when (selectedTab) {
                 NewsTab.News -> NewsScreen(
+                    listState = newsListState,
                     onShowSnackbar = { message ->
                         snackbarHostState.showSnackbar(message)
                     }
