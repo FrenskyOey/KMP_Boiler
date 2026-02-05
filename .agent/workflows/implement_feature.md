@@ -25,13 +25,14 @@ This workflow uses `// turbo-all` to auto-execute command steps, but requires ma
 **Objective**: Generate comprehensive plan documents.
 
 1. **Create Plan Files**:
-    - Create `shared/src/commonMain/kotlin/feature/[name]/domain/domain-plan.md`
-    - Create `shared/src/commonMain/kotlin/feature/[name]/data/data-plan.md`
-    - Create `composeApp/src/commonMain/kotlin/[package]/feature/[name]/ui-plan.md`
+    - Create `composeApp/src/commonMain/kotlin/feature/[name]/domain/domain-plan.md`
+    - Create `composeApp/src/commonMain/kotlin/feature/[name]/data/data-plan.md`
+    - Create `composeApp/src/commonMain/kotlin/feature/[name]/ui/ui-plan.md`
 
 2. **Populate Plans**:
     - Use the templates defined in `WORKFLOW_RULES.md`.
     - Include a "Requirements Clarification Summary" in each plan.
+    - **Impact Analysis**: List existing tests/components (Domain, Data, ViewModel) that will be broken by this change and the strategy to fix them (Update vs Delete).
 
 3. **Request Review**:
     - Ask the user to review the plans.
@@ -45,7 +46,10 @@ This workflow uses `// turbo-all` to auto-execute command steps, but requires ma
     - Create data classes, sealed classes in `domain/model/`.
 2. **Implement Repository Interface**:
     - Define interface in `domain/repository/`.
-3. **Implement Use Cases**:
+3. **Activate Skill (TDD)**:
+    - Use the `tdd_implementation` skill.
+    - **Instruction**: Write tests for Use Cases first, then implement.
+4. **Implement Use Cases**:
     - Create use cases in `domain/usecase/`.
 4. **Implement Tests**:
     - Write unit tests in `commonTest`.
@@ -60,7 +64,10 @@ This workflow uses `// turbo-all` to auto-execute command steps, but requires ma
     - Create models in `data/model/` matching API JSON.
 2. **Implement Mappers**:
     - Create mapping functions (DTO -> Domain).
-3. **Implement Data Sources**:
+3. **Activate Skill (TDD)**:
+    - Use the `tdd_implementation` skill.
+    - **Instruction**: Write tests for Repositories and Data Sources first, then implement.
+4. **Implement Data Sources**:
     - Create `RemoteDataSource` (Ktor) and `LocalDataSource` (Room/DataStore) in `data/source/`.
 4. **Implement Repository**:
     - Implement the interface in `data/repository/`.

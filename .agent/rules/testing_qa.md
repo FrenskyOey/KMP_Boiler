@@ -80,3 +80,30 @@ Before accepting code, verify:
 - [ ] No imports from other features
 - [ ] Can be removed without breaking other features
 - [ ] Has its own tests
+
+# Regression & Impact Analysis
+
+## Trigger
+**ALWAYS** perform this check when modifying existing logic in:
+- **Domain Layer**: UseCases, Models
+- **Data Layer**: Repositories, DataSources
+- **Presentation Layer**: ViewModels, State Reducers
+
+## Protocol
+
+1.  **Identify Dependents**:
+    Before writing code, search for usages and tests:
+     - `grep_search(Query="<ComponentName>", ...)`
+     - `find_by_name(Pattern="*Test.kt", ...)`
+
+2.  **Analyze Impact**:
+    - **Case A (Refactor)**: Internal logic change, output remains same.
+      - **Constraint**: Existing tests MUST pass without modification.
+    - **Case B (Logic Change)**: Business rule change (e.g. min age 18 -> 21).
+      - **Action**: You MUST identify conflicting tests and plan to UPDATE them.
+    - **Case C (Deprecation)**: Feature removed.
+      - **Action**: Propose DELETING valid tests.
+
+3.  **Notify User**:
+    - If tests need updates/deletion, list them in the Plan or Response.
+    - Ask for confirmation if deleting tests.

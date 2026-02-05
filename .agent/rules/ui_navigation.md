@@ -55,18 +55,30 @@ class NewsFeedViewModel(
 ## Navigation Between Features
 
 ```kotlin
-// ✅ CORRECT - Navigation at app level
-NavHost(navController, startDestination = Screen.NewsFeedList.route) {
+// ✅ CORRECT - Type-Safe Navigation at app level
+@Serializable object NewsFeedList
+@Serializable data class NewsDetail(val id: String)
+@Serializable object Settings
+
+NavHost(navController, startDestination = NewsFeedList) {
     // News feature screens
-    composable(Screen.NewsFeedList.route) {
+    composable<NewsFeedList> {
         NewsScreen(
-            onNewsItemClick = { id -> navController.navigate(Screen.NewsDetail.createRoute(id)) },
-            onSettingsClick = { navController.navigate(Screen.Settings.route) }
+            onNewsItemClick = { id -> navController.navigate(NewsDetail(id)) },
+            onSettingsClick = { navController.navigate(Settings) }
+        )
+    }
+    
+    composable<NewsDetail> { backStackEntry ->
+        val args = backStackEntry.toRoute<NewsDetail>()
+        NewsDetailScreen(
+            newsId = args.id,
+            onBackClick = { navController.popBackStack() }
         )
     }
     
     // Settings feature screens
-    composable(Screen.Settings.route) {
+    composable<Settings> {
         SettingScreen(
             onBackClick = { navController.popBackStack() }
         )
