@@ -6,35 +6,9 @@ description: UI organization and navigation rules
 
 ## Feature-Based UI Structure
 
-```kotlin
-composeApp/src/commonMain/kotlin/
-├── core/
-│   ├── theme/                 # Shared theme
-│   ├── navigation/            # Navigation setup
-│   └── components/            # Shared components
-└── feature/
-    ├── news/
-    │   ├── data/
-    │   ├── domain/
-    │   ├── di/
-    │   └── ui/
-    │       ├── main/
-    │       │   ├── NewsScreen.kt
-    │       │   ├── NewsFeedViewModel.kt
-    │       │   └── components/
-    │       └── detail/
-    │           ├── NewsDetailScreen.kt
-    │           └── NewsDetailViewModel.kt
-    └── settings/
-        ├── data/
-        ├── domain/
-        ├── di/
-        └── ui/
-            └── main/
-                ├── SettingScreen.kt
-                ├── SettingsViewModel.kt
-                └── components/
-```
+> [!NOTE]
+> Please refer to `project_architecture.md` for the canonical directory structure.
+
 
 ## UI Rules
 

@@ -29,23 +29,9 @@ description: Naming conventions, file rules, and error handling
 
 ## File Location Rules
 
-```kotlin
-// CORRECT - Shared utilities in core
-core/data/remote/util/ApiErrorHandler.kt
-core/domain/model/Result.kt
-core/domain/model/AppException.kt
+> [!NOTE]
+> Please refer to `project_architecture.md` for detailed file location and structure rules.
 
-// CORRECT - Feature-specific in feature
-feature/news/data/remote/api/NewsApiService.kt
-feature/news/domain/model/NewsFeed.kt
-feature/news/di/NewsModule.kt
-
-// WRONG - Feature-specific in core
-core/domain/model/NewsFeed.kt  // Should be in feature/news/
-
-// WRONG - Shared utility in feature
-feature/news/data/util/ApiErrorHandler.kt  // Should be in core/
-```
 
 ## Error Handling Rules
 
@@ -291,8 +277,10 @@ Before marking work complete:
 - [ ] No hardcoded values - use named constants
 - [ ] No magic numbers - define meaningful constant names
 
-### Immutability:
-- [ ] No mutation of shared state
-- [ ] Use `copy()` for data class modifications
+// ... existing items ...
 - [ ] Use immutable collections where possible
 - [ ] StateFlow updates use `update {}` pattern
+
+### Documentation:
+- [ ] **Context Check**: Did you change architecture or patterns? If yes, activate `documentation_maintenance` skill to update `.agent/rules`.
+
