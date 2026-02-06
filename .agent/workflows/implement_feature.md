@@ -60,18 +60,26 @@ This workflow uses `// turbo-all` to auto-execute command steps, but requires ma
 
 **Trigger**: User approves `data-plan.md` (or after Domain is done).
 
-1. **Implement Response/DTOs**:
-    - Create models in `data/model/` matching API JSON.
-2. **Implement Mappers**:
-    - Create mapping functions (DTO -> Domain).
-3. **Activate Skill (TDD)**:
+**Pre-requisite**: Activate `data_implementation` skill.
+
+1.  **Define Structure**:
+    - Create `data/model/` structure (`entity`, `request`, `response`, `mapper`).
+    - Define `[Feature]ApiService` interface in `data/api/`.
+    - Define `[Feature]DataSource` interface in `data/datasource/`.
+
+2.  **Activate Skill (TDD)**:
     - Use the `tdd_implementation` skill.
     - **Instruction**: Write tests for Repositories and Data Sources first, then implement.
-4. **Implement Data Sources**:
-    - Create `RemoteDataSource` (Ktor) and `LocalDataSource` (Room/DataStore) in `data/source/`.
-4. **Implement Repository**:
-    - Implement the interface in `data/repository/`.
-5. **Verify**:
+
+3.  **Implement Components (Standardized)**:
+    - **ApiService**: Implement Ktor logic in `data/api/`.
+    - **Data Sources**: Implement `Remote` (Throw Errors) and `Local` (DataStore/DB) in `data/datasource/`.
+    - **Repository**: Implement interface in `data/repository/` (Return Result).
+
+4.  **DI Registration**:
+    - Update `di/[Feature]Module.kt` to bind Service, DataSources, and Repository.
+
+5.  **Verify**:
     - Run tests for data sources and repository.
 
 ## Phase 4: UI Layer Implementation

@@ -7,7 +7,10 @@ import coil3.network.ktor3.KtorNetworkFetcherFactory
 import core.di.coreDatabaseModule
 import core.di.coreNetworkModule
 import core.di.corePreferencesModule
+import core.di.coreNetworkModule
+import core.di.corePreferencesModule
 import core.di.coreConfigModule
+import core.di.secureStorageModule
 import di.appModule
 import feature.news.di.newsModule
 import feature.settings.di.settingsModule
@@ -37,7 +40,9 @@ class MyApp : Application() {
                 coreNetworkModule,
                 coreDatabaseModule,
                 corePreferencesModule,
+                corePreferencesModule,
                 coreConfigModule,
+                secureStorageModule,
                 
                 // Feature modules
                 newsModule,
