@@ -104,6 +104,9 @@ kotlin {
             
             // DataStore
             implementation(libs.androidx.datastore.preferences)
+
+            // Okio
+            implementation(libs.okio)
         }
         
         iosMain.dependencies {
