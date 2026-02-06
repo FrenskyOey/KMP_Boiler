@@ -1,6 +1,6 @@
 ---
 name: resource_management
-description: Standards for handling Strings, Images, Fonts, and Files in Compose Multiplatform using the 'Res' object.
+description: Manages shared UI resources (strings, images, fonts) using the 'Res' object. Use when adding or refactoring resources.
 ---
 
 # Resource Management Skill
@@ -15,6 +15,24 @@ Activate this skill when:
 - Adding custom fonts.
 - Reading raw files (JSON, etc.).
 - Refactoring hardcoded strings or platform-specific resource calls (e.g., `R.string`, `UIImage`).
+
+## Detection Protocol
+
+**Before applying this skill, scan the codebase for these patterns:**
+
+1. **Platform-Specific Resources:**
+   - Android: `R.string.*`, `R.drawable.*`, `R.font.*`
+   - iOS: `UIImage(named:)`, `NSLocalizedString`
+   
+2. **Hardcoded Strings in UI:**
+   - `Text("Hardcoded string")` without `stringResource()`
+   - Button labels with direct strings
+   
+3. **Non-Res Image Loading:**
+   - `painterResource(R.drawable.*)`
+   - Direct file paths to images
+
+**If any pattern is found → Activate this skill and refactor immediately.**
 
 ## Core Principle
 **NEVER** use platform-specific resource classes (like Android's `R` class or iOS bundles).
@@ -110,3 +128,10 @@ val jsonString = Res.readBytes("files/data.json").decodeToString()
 - [ ] Are images in `drawable/`?
 - [ ] Is `Res.string` / `Res.drawable` used instead of `R.*`?
 - [ ] Are imports pointing to the generated `Res` class?
+
+## Post-Implementation Verification
+
+After refactoring resources:
+1. **Build Test**: Run `./gradlew build` to ensure Res generation succeeds
+2. **Search for Violations**: Use `grep_search` to find any remaining `R.string` or hardcoded strings
+3. **Runtime Test**: Launch app and verify all resources load correctly across platforms

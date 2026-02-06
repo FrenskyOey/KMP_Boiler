@@ -1,6 +1,6 @@
 ---
 name: documentation_maintenance
-description: maintain and update project documentation (.agent/rules) to prevent context rot.
+description: Maintains documentation accuracy. Use when codebase architecture, patterns, or dependencies change.
 ---
 
 # Documentation Maintenance Skill
@@ -38,3 +38,11 @@ When closing a major feature or refactor task, run this check:
 - [ ] **Patterns**: Did I change how we handle DI, Navigation, or Errors? -> Update `coding_standards.md`.
 - [ ] **Libraries**: Did I add a new KMP dependency? -> Update `tech_stack.md`.
 - [ ] **Workflows**: Did I discover a better way to work? -> Update `workflows/*.md`.
+
+### 4. Post-Update Verification
+
+After updating documentation:
+- [ ] Run a test implementation using the updated rule to verify accuracy
+- [ ] Confirm no conflicts with other rules in `.agent/rules/` or `.agent/skills/`
+- [ ] Update the `LAST_UPDATED` comment in the rule file (if applicable)
+

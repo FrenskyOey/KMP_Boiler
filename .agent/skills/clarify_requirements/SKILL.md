@@ -1,6 +1,6 @@
 ---
 name: clarify_requirements
-description: Ask mandatory questions to clarify requirements before planning a feature.
+description: Clarifies requirements by asking mandatory questions. Use when users request new features or complex changes.
 ---
 
 # Requirement Clarification Skill

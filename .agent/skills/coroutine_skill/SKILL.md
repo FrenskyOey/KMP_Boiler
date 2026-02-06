@@ -1,6 +1,6 @@
 ---
 name: coroutine_skill
-description: Authoritative rules and patterns for production-quality Kotlin Coroutines onto Android. Covers structured concurrency, lifecycle integration, and reactive streams.
+description: Enforces authoritative Coroutine patterns for safety. Use when writing asynchronous code, ViewModels, or Flows.
 ---
 
 # Coroutine Skill
@@ -25,6 +25,10 @@ Activate this skill when the user asks to:
 *   "Convert a listener/callback to Coroutines."
 *   "Implement a ViewModel."
 *   "Handle UI state updates."
+
+**Detection Keywords**: "async", "background", "fetch", "load data", "API call", "database query", "Flow", "StateFlow", "ViewModel", "coroutine", "suspend"
+
+---
 
 ## Critical Rules & Constraints
 

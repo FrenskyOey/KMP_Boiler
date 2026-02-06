@@ -1,6 +1,6 @@
 ---
 name: UI Implementation
-description: Enforce usage of the project's design system (core/theme) and reusable components (core/components) when implementing any UI layouts.
+description: Enforces the Core Design System and forbids hardcoded values. Use when implementing UI layouts or components.
 ---
 
 # UI Implementation Skill
@@ -14,6 +14,29 @@ Automatically apply this skill when:
 - Adding or modifying UI components
 - Working with colors, typography, or spacing
 - User requests involving: "layout", "screen", "component", "button", "input", "form", "UI", "design"
+
+## Detection Protocol
+
+**Automatically scan for these violations before implementing UI:**
+
+1. **Hardcoded Colors:**
+   - `Color(0xFF...)` or `Color.Red`, `Color.Blue`, etc.
+   - `MaterialTheme.colorScheme.primary` (direct access)
+
+2. **Hardcoded Spacing:**
+   - `.padding(16.dp)`, `.size(24.dp)`
+   - Any numeric `.dp` values
+
+3. **Hardcoded Typography:**
+   - `fontSize = 14.sp`, `fontWeight = FontWeight.Bold`
+   - `MaterialTheme.typography.*` (direct access)
+
+4. **Missing Core Components:**
+   - `Button()` instead of `CoreButton()`
+   - `TextField()` instead of `CoreTextInput()`
+   - `TopAppBar()` instead of `CoreTopAppBar()`
+
+**If any pattern is found → Activate this skill and refactor to design system.**
 
 ---
 
@@ -205,99 +228,13 @@ Would you like me to:
 (B) Use closest existing value? ([closest options])"
 ```
 
+
 ---
 
-## Quick Reference Tables
+## Quick Reference
 
-### Color Helpers
-| Function | Description |
-|----------|-------------|
-| `getPrimaryColor()` | Primary brand color |
-| `getOnPrimaryColor()` | Content on primary |
-| `getPrimaryContainerColor()` | Primary container |
-| `getOnPrimaryContainerColor()` | Content on primary container |
-| `getSecondaryColor()` | Secondary color |
-| `getOnSecondaryColor()` | Content on secondary |
-| `getSecondaryContainerColor()` | Secondary container |
-| `getOnSecondaryContainerColor()` | Content on secondary container |
-| `getTertiaryColor()` | Tertiary color |
-| `getTertiaryContainerColor()` | Tertiary container |
-| `getBackgroundColor()` | Background |
-| `getOnBackgroundColor()` | Content on background |
-| `getSurfaceColor()` | Surface |
-| `getOnSurfaceColor()` | Content on surface |
-| `getSurfaceVariantColor()` | Surface variant |
-| `getOutlineColor()` | Outline/border |
-| `getErrorColor()` | Error state |
-| `getOnErrorColor()` | Content on error |
-| `getErrorContainerColor()` | Error container |
-
-### Spacing Values
-| Object | Value | Size |
-|--------|-------|------|
-| `Dimens.XXS` | 2dp | Extra extra small |
-| `Dimens.XS` | 4dp | Extra small |
-| `Dimens.S` | 8dp | Small |
-| `Dimens.SM` | 12dp | Small-Medium |
-| `Dimens.M` | 16dp | Medium (base) |
-| `Dimens.ML` | 20dp | Medium-Large |
-| `Dimens.L` | 24dp | Large |
-| `Dimens.XL` | 32dp | Extra large |
-| `Dimens.XXL` | 40dp | Extra extra large |
-| `Dimens.XXXL` | 48dp | Extra extra extra large |
-| `Dimens.H` | 56dp | Huge |
-| `Dimens.XH` | 64dp | Extra huge |
-| `Dimens.XXH` | 72dp | Extra extra huge |
-| `Dimens.XXXH` | 80dp | Maximum |
-
-| Semantic | Maps To | Size |
-|----------|---------|------|
-| `Spacing.Micro` | Dimens.XXS | 2dp |
-| `Spacing.Tiny` | Dimens.XS | 4dp |
-| `Spacing.ExtraSmall` | Dimens.S | 8dp |
-| `Spacing.Small` | Dimens.SM | 12dp |
-| `Spacing.Medium` | Dimens.M | 16dp |
-| `Spacing.MediumPlus` | Dimens.ML | 20dp |
-| `Spacing.Large` | Dimens.L | 24dp |
-| `Spacing.ExtraLarge` | Dimens.XL | 32dp |
-| `Spacing.Huge` | Dimens.XXL | 40dp |
-| `Spacing.Massive` | Dimens.XXXL | 48dp |
-| `Spacing.Giant` | Dimens.H | 56dp |
-| `Spacing.Enormous` | Dimens.XH | 64dp |
-| `Spacing.Colossal` | Dimens.XXH | 72dp |
-| `Spacing.Maximum` | Dimens.XXXH | 80dp |
-
-### Component Dimensions
-| Value | Size | Use For |
-|-------|------|---------|
-| `ComponentDimens.ButtonHeightSmall` | 32dp | Small buttons |
-| `ComponentDimens.ButtonHeightMedium` | 40dp | Default buttons |
-| `ComponentDimens.ButtonHeightLarge` | 48dp | Large buttons |
-| `ComponentDimens.IconSizeSmall` | 16dp | Small icons |
-| `ComponentDimens.IconSizeMedium` | 24dp | Default icons |
-| `ComponentDimens.IconSizeLarge` | 32dp | Large icons |
-| `ComponentDimens.CardCornerRadius` | 12dp | Card corners |
-| `ComponentDimens.TextFieldHeight` | 56dp | Input height |
-| `ComponentDimens.TopAppBarHeight` | 64dp | Top bar height |
-
-### Typography Helpers
-| Function | Size | Weight |
-|----------|------|--------|
-| `getTextDisplayLarge()` | 57sp | Normal |
-| `getTextDisplayMedium()` | 45sp | Normal |
-| `getTextDisplaySmall()` | 36sp | Normal |
-| `getTextHeadlineLarge()` | 32sp | Normal |
-| `getTextHeadlineMedium()` | 28sp | Normal |
-| `getTextHeadlineSmall()` | 24sp | Normal |
-| `getTextTitleLarge()` | 22sp | Normal |
-| `getTextTitleMedium()` | 16sp | Medium |
-| `getTextTitleSmall()` | 14sp | Medium |
-| `getTextBodyLarge()` | 16sp | Normal |
-| `getTextBodyMedium()` | 14sp | Normal |
-| `getTextBodySmall()` | 12sp | Normal |
-| `getTextLabelLarge()` | 14sp | Medium |
-| `getTextLabelMedium()` | 12sp | Medium |
-| `getTextLabelSmall()` | 11sp | Medium |
+For complete design system reference (colors, spacing, typography, components), see:
+**[Design System Reference](./references/design_system_reference.md)**
 
 ---
 

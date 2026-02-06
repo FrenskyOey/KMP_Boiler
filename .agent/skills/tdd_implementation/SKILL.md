@@ -1,6 +1,6 @@
 ---
 name: tdd_implementation
-description: Enforce Test-Driven Development (TDD) practices in Kotlin Multiplatform projects.
+description: Enforces Test-Driven Development (TDD) by writing failing tests first. Use when implementing Domain or Data layers.
 ---
 
 # TDD Implementation Skill
@@ -53,6 +53,18 @@ Enforce the creation of unit tests based on TDD best practices BEFORE implementi
 
 ### 10. Review Coverage
 - **Rule**: Aim for high code coverage (80%+) to ensure robustness.
+
+## When NOT to Use
+
+TDD is not appropriate for:
+- **Pure UI layout code** (no business logic, only visual arrangement)
+- **Simple data class definitions** (models with no behavior)
+- **Configuration files** (build scripts, manifest files)
+- **Exploratory prototyping** (rapid proof-of-concept code that will be discarded)
+
+**For Presentation Layer (ViewModels)**: TDD is OPTIONAL but recommended for complex state management.
+
+---
 
 ## Instructions
 When implementing a Domain UseCase or Data Repository:
