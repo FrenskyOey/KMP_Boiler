@@ -6,7 +6,7 @@
 - **Endpoint**: `POST https://cd841015-7e2e-4a18-8082-a7c23d45097e.mock.pstmn.io/v1/login`
 - **Base URL**: From AppConfig (mock Postman URL for now)
 - **Request Format**: `x-www-form-urlencoded`
-  - `userName`: email (case-sensitive)
+  - `userName`: emails (case-sensitive)
   - `password`: MD5 hash
 - **Success Response**: `{ data: { user_name, user_id, token }, is_success: true }`
 - **Error Response**: `{ data: null, error_message: "...", is_success: false }`
