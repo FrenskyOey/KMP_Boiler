@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,12 +22,14 @@ import feature.settings.ui.text.TextScreen
 import org.koin.compose.koinInject
 import core.domain.repository.SessionRepository
 import core.domain.repository.SessionState
+import kotlinx.coroutines.launch
 
 @Composable
 fun App() {
     val authRepository = koinInject<AuthRepository>()
     val sessionRepository = koinInject<SessionRepository>()
     val navController = rememberNavController()
+    val coroutineScope = rememberCoroutineScope()
     
     // Session Source of Truth
     val sessionState by sessionRepository.sessionState.collectAsState()
@@ -68,6 +71,11 @@ fun App() {
                             SettingsAction.OpenButtons -> navController.navigate("settings_button")
                             SettingsAction.OpenForm -> navController.navigate("settings_form")
                             SettingsAction.OpenNavBar -> navController.navigate("settings_navbar")
+                            SettingsAction.Logout -> {
+                                coroutineScope.launch {
+                                    sessionRepository.invalidateSession()
+                                }
+                            }
                         }
                     }
                 )

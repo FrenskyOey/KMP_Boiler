@@ -1,17 +1,21 @@
 package feature.onboarding.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,30 +32,41 @@ fun LoginHeader(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // App Icon
-        Icon(
-            imageVector = Icons.Default.Receipt, // Using Receipt icon as placeholder for News app
-            contentDescription = null,
-            modifier = Modifier.size(ComponentDimens.IconSizeLarge),
-            tint = getPrimaryColor()
-        )
+        // App Icon with blue rounded background
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .clip(RoundedCornerShape(28.dp))
+                .background(getPrimaryColor()), // Blue background
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Receipt,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = Color.White
+            )
+        }
         
-        Spacer(modifier = Modifier.height(Spacing.Medium))
+        Spacer(modifier = Modifier.height(Spacing.Large))
         
-        // Title
+        // App Title
         Text(
-            text = "Welcome Back",
-            style = getTextHeadlineLarge().copy(fontWeight = FontWeight.Bold),
+            text = "News Feedz",
+            style = getTextHeadlineLarge().copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = getTextHeadlineLarge().fontSize
+            ),
             color = getOnBackgroundColor(),
             textAlign = TextAlign.Center
         )
         
         Spacer(modifier = Modifier.height(Spacing.Small))
         
-        // Subtitle
+        // Tagline
         Text(
-            text = "Enter your credentials to access your personalized news feed.",
-            style = getTextBodyMedium(),
+            text = "Catch up with the world",
+            style = getTextBodyLarge(),
             color = getOnSurfaceVariantColor(),
             textAlign = TextAlign.Center
         )

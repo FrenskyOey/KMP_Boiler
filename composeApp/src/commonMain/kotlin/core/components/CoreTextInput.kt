@@ -210,6 +210,7 @@ fun CoreEmailInput(
         placeholder = placeholder,
         helperText = helperText,
         errorText = errorText,
+        leadingIcon = Icons.Default.Email,
         trailingIcon = if (value.isNotEmpty() && onClearClick != null) {
             Icons.Default.Close
         } else null,
@@ -252,6 +253,7 @@ fun CorePasswordInput(
         modifier = modifier,
         helperText = helperText,
         errorText = errorText,
+        leadingIcon = Icons.Default.Key,
         trailingIcon = if (visible) {
             Icons.Default.VisibilityOff
         } else {

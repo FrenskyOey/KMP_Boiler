@@ -82,7 +82,7 @@ fun LoginScreen(
                 .imePadding(), // Handle keyboard overlap
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(Spacing.ExtraLarge * 2))
+            Spacer(modifier = Modifier.height(Spacing.ExtraLarge))
             
             LoginHeader()
             
