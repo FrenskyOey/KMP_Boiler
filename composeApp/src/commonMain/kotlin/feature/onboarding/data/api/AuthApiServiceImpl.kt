@@ -15,7 +15,7 @@ class AuthApiServiceImpl(
     private val appConfig: AppConfig
 ) : AuthApiService {
     override suspend fun login(request: LoginRequest): LoginResponse {
-        val endpoint = "${appConfig.baseApiUrl}v1/login"
+        val endpoint = "${appConfig.baseApiUrl}login"
         return httpClient.post(endpoint) {
             contentType(ContentType.Application.FormUrlEncoded)
             setBody(mapOf(

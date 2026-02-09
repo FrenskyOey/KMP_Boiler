@@ -13,6 +13,7 @@ import core.di.coreConfigModule
 import core.di.secureStorageModule
 import di.appModule
 import feature.news.di.newsModule
+import feature.onboarding.di.onboardingModule
 import feature.settings.di.settingsModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -47,6 +48,7 @@ class MyApp : Application() {
                 // Feature modules
                 newsModule,
                 settingsModule,
+                onboardingModule,
                 
                 // App module
                 appModule
