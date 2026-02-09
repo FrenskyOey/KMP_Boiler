@@ -234,9 +234,16 @@ fun CorePasswordInput(
     label: String = "Password",
     helperText: String? = null,
     errorText: String? = null,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    isPasswordVisible: Boolean? = null,
+    onTogglePasswordVisibility: (() -> Unit)? = null
 ) {
-    var passwordVisible by remember { mutableStateOf(false) }
+    val (visible, onToggle) = if (isPasswordVisible != null && onTogglePasswordVisibility != null) {
+        isPasswordVisible to onTogglePasswordVisibility
+    } else {
+        val internalState = remember { mutableStateOf(false) }
+        internalState.value to { internalState.value = !internalState.value }
+    }
 
     CoreTextInput(
         value = value,
@@ -245,18 +252,18 @@ fun CorePasswordInput(
         modifier = modifier,
         helperText = helperText,
         errorText = errorText,
-        trailingIcon = if (passwordVisible) {
+        trailingIcon = if (visible) {
             Icons.Default.VisibilityOff
         } else {
             Icons.Default.Visibility
         },
-        onTrailingIconClick = { passwordVisible = !passwordVisible },
+        onTrailingIconClick = onToggle,
         enabled = enabled,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
         ),
-        visualTransformation = if (passwordVisible) {
+        visualTransformation = if (visible) {
             VisualTransformation.None
         } else {
             PasswordVisualTransformation()

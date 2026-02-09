@@ -418,3 +418,52 @@ fun <T> CoreSegmentedButtonGroup(
         }
     }
 }
+
+/**
+ * Loading Button - Primary button with loading state
+ * When [isLoading] is true, text is hidden and spinner is shown
+ */
+@Composable
+fun CoreLoadingButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
+    enabled: Boolean = true,
+    icon: ImageVector? = null
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(ComponentDimens.ButtonHeightMedium),
+        enabled = enabled && !isLoading,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = if (isLoading) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+            disabledContentColor = if (isLoading) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+        ),
+        shape = MaterialTheme.shapes.small,
+        contentPadding = PaddingValues(
+            horizontal = ComponentDimens.ButtonPaddingHorizontal,
+            vertical = ComponentDimens.ButtonPaddingVertical
+        )
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(ComponentDimens.IconSizeMedium),
+                color = MaterialTheme.colorScheme.onPrimary,
+                strokeWidth = 2.dp
+            )
+        } else {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(ComponentDimens.IconSizeMedium)
+                )
+                Spacer(modifier = Modifier.width(Spacing.ExtraSmall))
+            }
+            Text(text = text)
+        }
+    }
+}

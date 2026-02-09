@@ -14,5 +14,7 @@ interface AuthDataSource {
         suspend fun getUser(): UserEntity?
         suspend fun clearUser()
         suspend fun getToken(): String?
+        suspend fun saveToken(token: String)
+        suspend fun clearToken()
     }
 }

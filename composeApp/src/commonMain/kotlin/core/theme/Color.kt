@@ -127,3 +127,4 @@ val DarkColorScheme = darkColorScheme(
 @Composable fun getErrorColor() = MaterialTheme.colorScheme.error
 @Composable fun getOnErrorColor() = MaterialTheme.colorScheme.onError
 @Composable fun getErrorContainerColor() = MaterialTheme.colorScheme.errorContainer
+@Composable fun getOnSurfaceVariantColor() = MaterialTheme.colorScheme.onSurfaceVariant

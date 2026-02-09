@@ -51,6 +51,14 @@ class FakeAuthLocalDataSource : AuthDataSource.Local {
     override suspend fun getToken(): String? {
         return token
     }
+
+    override suspend fun clearToken() {
+        token = null
+    }
+
+    override suspend fun saveToken(token: String) {
+       this.token = token
+    }
 }
 
 class AuthRepositoryImplTest {

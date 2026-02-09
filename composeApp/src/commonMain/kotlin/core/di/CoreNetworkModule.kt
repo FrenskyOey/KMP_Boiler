@@ -14,9 +14,18 @@ import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import org.koin.core.qualifier.named
 
+import core.data.repository.SessionRepositoryImpl
+import core.domain.repository.SessionRepository
+import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.http.HttpStatusCode
+
 val coreNetworkModule = module {
+    single<SessionRepository> { SessionRepositoryImpl(get(named("secure"))) }
+
     single {
         val secureSettings: Settings = get(named("secure"))
+        val sessionRepository: SessionRepository = get()
+        
         HttpClient {
             install(Auth) {
                 bearer {
@@ -35,6 +44,14 @@ val coreNetworkModule = module {
             }
             install(Logging) {
                 level = LogLevel.ALL
+            }
+            
+            HttpResponseValidator {
+                validateResponse { response ->
+                    if (response.status == HttpStatusCode.Unauthorized) {
+                        sessionRepository.invalidateSession()
+                    }
+                }
             }
         }
     }

@@ -39,4 +39,5 @@ interface AuthRepository {
      * @return true if user is logged in, false otherwise
      */
     suspend fun isLoggedIn(): Boolean
+    
 }

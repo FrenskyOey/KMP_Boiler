@@ -84,12 +84,22 @@ This workflow uses `// turbo-all` to auto-execute command steps, but requires ma
 
 ## Phase 4: UI Layer Implementation
 
+> [!CAUTION]
+> **STRICT RULE**: You are **FORBIDDEN** from modifying any logic in `data` or `domain` modules during this phase without explicit user confirmation.
+> **Scope**: You may ONLY create/edit files that exist in the `ui` / `presentation` layer.
+> **Verification**: Before starting any UI plan, verify that the Domain module fulfills all specifications. If not, **ASK THE USER** immediately.
+
 ### Phase 4.1: UI Design Specification
 **Trigger**: User approves `ui-overview-plan.md` (or after Data is done).
 
 **Objective**: Create detailed UI specification before any code is written.
 
-1. **UI Requirements Gathering Session**:
+1. **Verify Domain Readiness (CRITICAL)**:
+    - **Check**: Review the `domain` module to ensure all necessary UseCases and Models are implemented and match UI requirements.
+    - **Action**: If usage of a missing UseCase or Model is required, **STOP** and Ask User. Do NOT implement logic yourself.
+    - **Goal**: Ensure UI changes do not break existing tests or logic.
+
+2. **UI Requirements Gathering Session**:
     - **PAUSE & ASK USER**:
         - What screens/views are needed? (e.g., List Screen, Detail Screen, Edit Form)
         - What's the primary user flow/journey?
@@ -168,6 +178,10 @@ This workflow uses `// turbo-all` to auto-execute command steps, but requires ma
 
 **Objective**: Build UI components one-by-one or in logical groups.
 
+**Prerequisite**:
+- **ACTIVATE SKILL**: You **MUST** read and follow `.agent/skills/ui_implementation/SKILL.md`.
+- **STRICT RULE**: No hardcoded colors/dimens. No direct `MaterialTheme` access. Use `core.theme` and `core.components` ONLY.
+
 **For EACH component** (or logical group of related components):
 
 1. **Announce Component**:
@@ -185,6 +199,8 @@ This workflow uses `// turbo-all` to auto-execute command steps, but requires ma
 3. **Show Preview Code**:
     - Display the component code
     - Explain key decisions made
+    - **VALIDATE**: Run the `ui_validation` skill on the new file to auto-fix any violations.
+    - **VERIFY**: Explicitly state "Checked against UI Implementation Skill: [Pass/Fail]"
 
 4. **Request Approval**:
     - **WAIT** for user to:
@@ -234,7 +250,17 @@ This workflow uses `// turbo-all` to auto-execute command steps, but requires ma
 1. **Setup Dependency Injection**:
     - Create `di/[FeatureName]Module.kt` (if not exists)
     - Register ViewModel, UseCases, Repositories in Koin
-    - Add module to main Koin configuration
+    - **CRITICAL**: Register module in ALL platform initialization files:
+        - **Android**: `composeApp/src/androidMain/kotlin/com/interview/prep/kmp_learn/MyApp.kt`
+            - Add import: `import feature.[name].di.[featureName]Module`
+            - Add to `modules()` list in `startKoin` block
+        - **iOS**: `composeApp/src/iosMain/kotlin/com/interview/prep/kmp_learn/KoinHelper.kt`
+            - Add import: `import feature.[name].di.[featureName]Module`
+            - Add to `modules()` list in `startKoin` block
+        - **Desktop**: `composeApp/src/desktopMain/kotlin/Main.kt`
+            - Add import: `import feature.[name].di.[featureName]Module`
+            - Add to `modules()` list in `startKoin` block
+    - **VERIFY**: Ensure the module file has a proper package declaration at the top
 
 2. **Setup Navigation**:
     - Add routes to navigation graph (e.g., in `navigation/NavGraph.kt`)

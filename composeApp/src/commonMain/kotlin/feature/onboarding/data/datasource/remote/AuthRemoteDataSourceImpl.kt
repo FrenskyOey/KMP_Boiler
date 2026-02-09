@@ -20,7 +20,7 @@ class AuthRemoteDataSourceImpl(
                 throw AppException.AuthException(response.errorMessage ?: "Unknown login error")
             }
         } catch (e: Exception) {
-            throw ApiErrorHandler.handleError(e)
+            throw e
         }
     }
 }

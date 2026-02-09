@@ -38,4 +38,12 @@ class AuthLocalDataSourceImpl(
     override suspend fun getToken(): String? {
         return secureSettings.getStringOrNull(KEY_USER_TOKEN)
     }
+
+    override suspend fun saveToken(token: String) {
+        secureSettings.putString(KEY_USER_TOKEN, token)
+    }
+
+    override suspend fun clearToken() {
+        secureSettings.remove(KEY_USER_TOKEN)
+    }
 }
