@@ -69,7 +69,9 @@ class AuthRepositoryImplTest {
 
     @Test
     fun `login success saves user and returns success`() = runTest {
-        val credentials = LoginCredentials("test@example.com", "password")
+        // Repository expects password to already be hashed (done by LoginUseCase)
+        val hashedPassword = "5f4dcc3b5aa765d61d8327deb882cf99" // MD5 of "password"
+        val credentials = LoginCredentials("test@example.com", hashedPassword)
         val userData = UserData("test@example.com", 123, "token")
         remoteDataSource.response = LoginResponse(userData, true)
 
@@ -79,12 +81,13 @@ class AuthRepositoryImplTest {
         val user = (result as Result.Success).data
         assertEquals("test@example.com", user.userName)
         assertEquals("test@example.com", localDataSource.savedUser?.userName)
-        assertEquals("5f4dcc3b5aa765d61d8327deb882cf99", remoteDataSource.lastLoginRequest?.password) // MD5 of "password"
+        assertEquals(hashedPassword, remoteDataSource.lastLoginRequest?.password)
     }
 
     @Test
     fun `login failure returns Error`() = runTest {
-        val credentials = LoginCredentials("test@example.com", "password")
+        val hashedPassword = "5f4dcc3b5aa765d61d8327deb882cf99" // MD5 of "password"
+        val credentials = LoginCredentials("test@example.com", hashedPassword)
         remoteDataSource.response = LoginResponse(null, false, "Invalid credentials")
 
         val result = repository.login(credentials)
