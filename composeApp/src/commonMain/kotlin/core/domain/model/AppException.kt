@@ -13,6 +13,7 @@ sealed class AppException(message: String? = null, cause: Throwable? = null) : E
     // Business logic errors
     data class ValidationError(val errorMessage: String) : AppException(errorMessage)
     data class NotFoundError(val errorMessage: String? = null) : AppException(errorMessage)
+    data class AuthException(val errorMessage: String) : AppException(errorMessage)
     
     // Unknown
     data class UnknownError(val errorMessage: String? = null, val throwable: Throwable? = null) : AppException(errorMessage, throwable)
