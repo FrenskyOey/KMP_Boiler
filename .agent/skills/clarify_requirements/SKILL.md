@@ -13,6 +13,48 @@ This skill ensures that the agent gathers ALL necessary information before gener
 - When the user requests a complex change that requires planning.
 - Triggered automatically by the `implement_feature` workflow.
 
+## Mode Selection
+
+### Quick Mode (Use for Simple Tasks)
+**Trigger if request is:**
+- Adding a single UI element (button, text field, icon)
+- Calling an existing API/UseCase
+- Simple configuration change (color, text, timeout)
+- Bug fix in existing code
+- Adding logging or debug statements
+
+**Quick Mode Process:**
+1. Ask ONLY 1-2 clarifying questions (if needed):
+   - "Where should this go?" (if ambiguous)
+   - "Any specific requirements?" (styling, behavior)
+2. Skip detailed API/Storage/UI questions
+3. Proceed immediately to implementation
+
+**Examples:**
+- "Add logout button to settings" → Quick Mode ✅
+- "Add app bar to login screen" → Quick Mode ✅
+- "Change icon color to blue" → Quick Mode ✅
+
+---
+
+### Full Mode (Use for Complex Features)
+**Trigger if request is:**
+- New feature with multiple screens
+- API integration (new endpoint)
+- Database schema changes
+- Complex business logic
+- Architecture decisions
+
+**Full Mode Process:**
+Follow the detailed questions below
+
+**Examples:**
+- "Implement user profile feature" → Full Mode ✅
+- "Add payment integration" → Full Mode ✅
+- "Create news feed with caching" → Full Mode ✅
+
+---
+
 ## Instructions
 
 ### 1. Analyze the Request
