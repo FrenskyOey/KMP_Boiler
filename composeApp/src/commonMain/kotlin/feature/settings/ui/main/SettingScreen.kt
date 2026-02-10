@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.CommentBank
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.SmartButton
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Card
@@ -86,6 +87,12 @@ fun SettingScreen(
             subtitle = "Nav Bar Design",
             icon = Icons.Default.Group,
             onClick = { onAction(SettingsAction.OpenNavBar) }
+        ),
+        SettingItem(
+            title = "Logout",
+            subtitle = "Sign out of your account",
+            icon = Icons.Default.Logout,
+            onClick = { onAction(SettingsAction.Logout) }
         )
     )
 

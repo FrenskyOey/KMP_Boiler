@@ -5,5 +5,6 @@ enum class SettingsAction {
     OpenText,
     OpenButtons,
     OpenForm,
-    OpenNavBar
+    OpenNavBar,
+    Logout
 }

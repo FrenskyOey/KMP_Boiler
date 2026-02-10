@@ -47,6 +47,9 @@ kotlin {
             // From shared androidMain
             implementation(libs.ktor.client.android)
             implementation(libs.kotlinx.coroutines.android)
+
+            // Security
+            implementation(libs.androidx.security.crypto)
         }
         val desktopMain by getting {
             dependencies {
@@ -97,6 +100,7 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.auth)
             
             // Room
             implementation(libs.androidx.room.runtime)
@@ -104,6 +108,13 @@ kotlin {
             
             // DataStore
             implementation(libs.androidx.datastore.preferences)
+
+            // Okio
+            implementation(libs.okio)
+
+            // Secure Storage
+            implementation(libs.multiplatform.settings)
+            implementation(libs.multiplatform.settings.no.arg)
         }
         
         iosMain.dependencies {
@@ -114,6 +125,8 @@ kotlin {
             implementation(libs.kotlin.test)
             // From shared commonTest
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.ktor.client.mock)
+            implementation(libs.multiplatform.settings.test)
         }
     }
 }

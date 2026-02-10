@@ -4,8 +4,11 @@ import core.di.coreConfigModule
 import core.di.coreDatabaseModule
 import core.di.coreNetworkModule
 import core.di.corePreferencesModule
+import core.di.secureStorageModule
 import di.appModule
 import feature.news.di.newsModule
+import feature.onboarding.di.onboardingModule
+
 import feature.settings.di.settingsModule
 import org.koin.core.context.startKoin
 
@@ -16,8 +19,10 @@ fun doInitKoin() {
             coreDatabaseModule,
             corePreferencesModule,
             coreConfigModule,
+            secureStorageModule,
             newsModule,
             settingsModule,
+            onboardingModule,
             appModule
         )
     }
