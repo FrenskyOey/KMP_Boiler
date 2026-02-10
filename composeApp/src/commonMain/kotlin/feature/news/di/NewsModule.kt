@@ -8,8 +8,8 @@ import feature.news.data.datasource.local.NewsLocalDataSourceImpl
 import feature.news.data.datasource.remote.NewsRemoteDataSourceImpl
 import feature.news.data.repository.NewsFeedRepositoryImpl
 import feature.news.domain.repository.NewsFeedRepository
-import feature.news.domain.usecase.GetArticleCountUseCase
-import feature.news.domain.usecase.GetNewsFeedUseCase
+import feature.news.domain.usecase.newsfeed.GetArticleCountUseCase
+import feature.news.domain.usecase.newsfeed.GetNewsFeedUseCase
 import feature.news.ui.main.NewsFeedViewModel
 import feature.settings.ui.main.SettingsViewModel
 import org.koin.core.module.dsl.factoryOf

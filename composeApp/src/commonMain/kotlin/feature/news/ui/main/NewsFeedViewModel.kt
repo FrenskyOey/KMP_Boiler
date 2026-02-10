@@ -3,8 +3,8 @@ package feature.news.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import core.domain.model.Result
-import feature.news.domain.usecase.GetArticleCountUseCase
-import feature.news.domain.usecase.GetNewsFeedUseCase
+import feature.news.domain.usecase.newsfeed.GetArticleCountUseCase
+import feature.news.domain.usecase.newsfeed.GetNewsFeedUseCase
 import feature.news.ui.main.state.NewsEffect
 import feature.news.ui.main.state.NewsIntent
 import feature.news.ui.main.state.NewsState

@@ -1,4 +1,4 @@
-package feature.news.domain.usecase
+package feature.news.domain.usecase.newsfeed
 
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
