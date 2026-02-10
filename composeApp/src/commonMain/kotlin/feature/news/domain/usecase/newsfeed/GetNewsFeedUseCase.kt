@@ -1,4 +1,4 @@
-package feature.news.domain.usecase
+package feature.news.domain.usecase.newsfeed
 
 import core.domain.model.Result
 import feature.news.domain.model.Article
