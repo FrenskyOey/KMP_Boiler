@@ -1,7 +1,7 @@
 package feature.news.domain.model
 
 data class NewsDetail(
-    val id: Int,
+    val id: Long,
     val title: String,
     val category: String,
     val image: String,

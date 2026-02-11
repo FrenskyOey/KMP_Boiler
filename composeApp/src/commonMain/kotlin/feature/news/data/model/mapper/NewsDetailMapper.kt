@@ -24,7 +24,7 @@ fun ArticleDetailResponse.toEntity(): ArticleDetailEntity {
 
 fun ArticleDetailEntity.toDomain(): NewsDetail {
     return NewsDetail(
-        id = id,
+        id = id.toLong(),
         title = title,
         category = category,
         image = image,

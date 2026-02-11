@@ -12,6 +12,7 @@ import feature.news.domain.usecase.newsfeed.GetArticleCountUseCase
 import feature.news.domain.usecase.newsfeed.GetNewsFeedUseCase
 import feature.news.domain.usecase.newsdetail.RefreshNewsDetailUseCase
 import feature.news.domain.usecase.newsdetail.GetNewsDetailUseCase
+import feature.news.ui.detail.NewsDetailViewModel
 import feature.news.ui.main.NewsFeedViewModel
 import feature.settings.ui.main.SettingsViewModel
 import feature.news.data.api.NewsDetailApiService
@@ -22,6 +23,7 @@ import feature.news.data.datasource.remote.NewsDetailRemoteDataSourceImpl
 import feature.news.data.repository.NewsDetailRepositoryImpl
 import feature.news.domain.repository.NewsDetailRepository
 import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val newsModule = module {
@@ -70,4 +72,7 @@ val newsModule = module {
     // News Detail UseCases
     factory { GetNewsDetailUseCase(get()) }
     factory { RefreshNewsDetailUseCase(get()) }
+    
+    // ViewModels
+    viewModelOf(::NewsDetailViewModel)
 }

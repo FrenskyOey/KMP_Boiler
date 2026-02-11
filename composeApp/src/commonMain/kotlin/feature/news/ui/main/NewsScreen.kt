@@ -37,6 +37,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun NewsScreen(
     listState: LazyListState,
     onShowSnackbar: suspend (String) -> Unit,
+    onArticleClick: (Long, String) -> Unit,
     viewModel: NewsFeedViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -97,7 +98,7 @@ fun NewsScreen(
                     itemsIndexed(state.articles, key = { index, _ -> index }) { _, article ->
                         NewsItemWidget(
                             article = article,
-                            onClick = { /* Handle click if needed */ }
+                            onClick = { onArticleClick(article.id, article.title) }
                         )
                     }
 

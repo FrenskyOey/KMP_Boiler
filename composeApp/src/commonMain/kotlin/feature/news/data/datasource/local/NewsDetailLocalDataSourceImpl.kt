@@ -9,8 +9,8 @@ class NewsDetailLocalDataSourceImpl(
     private val dao: NewsDetailDao
 ) : NewsDetailDataSource.Local {
 
-    override fun getNewsDetail(id: Int): Flow<ArticleDetailEntity?> {
-        val xid = id % 8
+    override fun getNewsDetail(id: Long): Flow<ArticleDetailEntity?> {
+        val xid = (id % 8).toInt()
         return dao.getNewsDetail(xid)
     }
 

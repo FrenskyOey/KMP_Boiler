@@ -30,7 +30,8 @@ import feature.settings.ui.main.SettingScreen
 @Composable
 fun DashboardScreen(
     modifier: Modifier = Modifier,
-    onSettingsAction: (SettingsAction) -> Unit
+    onSettingsAction: (SettingsAction) -> Unit,
+    onArticleClick: (Long, String) -> Unit
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(NewsTab.News) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -65,7 +66,8 @@ fun DashboardScreen(
                     listState = newsListState,
                     onShowSnackbar = { message ->
                         snackbarHostState.showSnackbar(message)
-                    }
+                    },
+                    onArticleClick = onArticleClick
                 )
                 NewsTab.Settings -> SettingScreen(
                     onAction = onSettingsAction
