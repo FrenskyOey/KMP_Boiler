@@ -9,6 +9,7 @@ data class NewsDetail(
     val publishedAt: String,
     val readTime: Int,
     val content: List<NewsContent>,
+    val tags: List<String>?,
     val shareUrl: String
 ) {
     data class Author(

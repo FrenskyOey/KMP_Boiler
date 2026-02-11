@@ -1,6 +1,5 @@
 package feature.news.domain.usecase.newsdetail
 
-import core.domain.model.Result
 import feature.news.domain.model.NewsDetail
 import feature.news.domain.model.NewsContent
 import feature.news.domain.repository.NewsDetailRepository
@@ -10,16 +9,15 @@ import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import core.domain.model.AppException
+import core.domain.model.Result
 
 class GetNewsDetailUseCaseTest {
 
-    private val fakeRepository = FakeNewsDetailRepository()
+    private val fakeRepository = FakeGetNewsDetailRepository()
     private val useCase = GetNewsDetailUseCase(fakeRepository)
 
     @Test
-    fun `invoke returns success result from repository`() = runTest {
+    fun `invoke returns flow from repository`() = runTest {
         // Given
         val newsDetail = NewsDetail(
             id = 1,
@@ -33,33 +31,31 @@ class GetNewsDetailUseCaseTest {
                 NewsContent.Paragraph("Content"),
                 NewsContent.Quote(text = "Quote text", highlighted = true, emphasis = true)
             ),
+            tags = null,
             shareUrl = "shareUrl"
         )
-        fakeRepository.setReturnData(Result.Success(newsDetail))
+        fakeRepository.setData(newsDetail)
 
         // When
-        val result = useCase(1).single() // This will fail initially as implementation returns emptyFlow
+        val result = useCase(1).single()
 
         // Then
-        assertTrue(result is Result.Success)
-        assertEquals(newsDetail, result.data)
+        assertEquals(newsDetail, result)
     }
 }
 
-class FakeNewsDetailRepository : NewsDetailRepository {
-    private var result: Result<NewsDetail>? = null
+class FakeGetNewsDetailRepository : NewsDetailRepository {
+    private var data: NewsDetail? = null
 
-    fun setReturnData(result: Result<NewsDetail>) {
-        this.result = result
+    fun setData(newsDetail: NewsDetail?) {
+        this.data = newsDetail
     }
 
+    override fun getNewsDetail(id: Int): Flow<NewsDetail?> {
+        return flowOf(data)
+    }
 
-
-    override fun getNewsDetail(id: Int): Flow<Result<NewsDetail>> {
-        return if (result != null) {
-            flowOf(result!!)
-        } else {
-            flowOf(Result.Error(AppException.UnknownError("No data set")))
-        }
+    override suspend fun refreshNewsDetail(id: Int): Result<Unit> {
+        return Result.Success(Unit)
     }
 }

@@ -77,6 +77,19 @@ You MUST ask these questions if the information is missing.
 - What table name should we use?
 - What is the cache expiration strategy?
 
+**Data Layer Architecture (for Repository implementation):**
+- **Where is the source of truth for this data?**
+  - a) **Database (local storage)**: Data fetched from remote, stored locally, DB emits Flow updates
+    - Example: News Detail, User Profile
+    - → Will use **CQS Pattern** (separate Query and Command)
+  - b) **Remote API (direct call)**: No local storage, direct API response return
+    - Example: Login, Submit Form
+    - → Will use **Standard Repository Pattern**
+  - c) **Mixed**: Some operations need local storage, others don't
+    - → Specify which operations need local storage
+    - → Will use CQS for local-backed operations only
+
+
 **UI/UX:**
 - What should be displayed in the list items?
 - What happens on item click?

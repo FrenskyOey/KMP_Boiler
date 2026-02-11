@@ -6,7 +6,7 @@ import feature.news.domain.repository.NewsDetailRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetNewsDetailUseCase(private val repository: NewsDetailRepository) {
-    operator fun invoke(id: Int): Flow<Result<NewsDetail>> {
+    operator fun invoke(id: Int): Flow<NewsDetail?> {
         return repository.getNewsDetail(id)
     }
 }
