@@ -4,5 +4,5 @@ import core.data.remote.model.BaseResponse
 import feature.news.data.model.response.ArticleDetailResponse
 
 interface NewsDetailApiService {
-    suspend fun getNewsDetail(id: Int): BaseResponse<ArticleDetailResponse>
+    suspend fun getNewsDetail(id: Long): BaseResponse<ArticleDetailResponse>
 }

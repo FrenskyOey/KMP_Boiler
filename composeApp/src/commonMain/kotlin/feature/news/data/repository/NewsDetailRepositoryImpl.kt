@@ -18,12 +18,12 @@ class NewsDetailRepositoryImpl(
     private val localDataSource: NewsDetailDataSource.Local
 ) : NewsDetailRepository {
 
-    override fun getNewsDetail(id: Int): Flow<NewsDetail?> {
+    override fun getNewsDetail(id: Long): Flow<NewsDetail?> {
         return localDataSource.getNewsDetail(id)
             .map { it?.toDomain() }
     }
 
-    override suspend fun refreshNewsDetail(id: Int): Result<Unit> {
+    override suspend fun refreshNewsDetail(id: Long): Result<Unit> {
         return try {
             val response = remoteDataSource.getNewsDetail(id)
             localDataSource.upsertNewsDetail(response.toEntity())

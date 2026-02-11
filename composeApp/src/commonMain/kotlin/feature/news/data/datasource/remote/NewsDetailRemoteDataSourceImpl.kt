@@ -11,7 +11,7 @@ class NewsDetailRemoteDataSourceImpl(
     private val apiService: NewsDetailApiService
 ) : NewsDetailDataSource.Remote {
 
-    override suspend fun getNewsDetail(id: Int): ArticleDetailResponse {
+    override suspend fun getNewsDetail(id: Long): ArticleDetailResponse {
         return try {
             val response = apiService.getNewsDetail(id)
             if (response.isSuccess) {

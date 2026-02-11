@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface NewsDetailDataSource {
     interface Remote {
-        suspend fun getNewsDetail(id: Int): ArticleDetailResponse
+        suspend fun getNewsDetail(id: Long): ArticleDetailResponse
     }
 
     interface Local {
-        fun getNewsDetail(id: Int): Flow<ArticleDetailEntity?>
+        fun getNewsDetail(id: Long): Flow<ArticleDetailEntity?>
         suspend fun upsertNewsDetail(article: ArticleDetailEntity)
     }
 }

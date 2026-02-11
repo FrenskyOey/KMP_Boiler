@@ -10,7 +10,7 @@ data class ArticleDetailResponse(
     @SerialName("category") val category: String,
     @SerialName("image") val image: String,
     @SerialName("author") val author: AuthorResponse,
-    @SerialName("published_at") val publishedAt: String,
+    @SerialName("publishedAt") val publishedAt: String,
     @SerialName("readTime") val readTime: Int,
     @SerialName("content") val content: List<ContentItemResponse>,
     @SerialName("tags") val tags: List<String>?,
