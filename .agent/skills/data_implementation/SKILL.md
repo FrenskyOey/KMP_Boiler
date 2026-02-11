@@ -100,7 +100,117 @@ try {
 }
 ```
 
-## 5. Implementation Workflow
+## 6. Command-Query Separation (CQS) Pattern
+
+### When to Use CQS
+
+**Decision Tree:**
+```
+Does Repository return Flow?
+├─ YES → Is Database the source of truth?
+│         ├─ YES → Use CQS Pattern ✅
+│         └─ NO → Standard Repository
+└─ NO → Standard Repository
+```
+
+**Use CQS Pattern When:**
+- ✅ Database is the source of truth
+- ✅ Repository returns `Flow` that emits updates
+- ✅ Data is fetched from remote and stored locally
+- ✅ Need to separate observation from refresh action
+
+**Examples:** News Detail, User Profile, Article List with caching
+
+**Don't Use CQS When:**
+- ❌ Simple API call without local storage
+- ❌ No Flow emissions needed
+- ❌ Direct return of API response
+- ❌ No database involvement
+
+**Examples:** Login, Submit Form, One-time API calls
+
+---
+
+### CQS Pattern Structure
+
+**Repository Interface:**
+```kotlin
+interface NewsDetailRepository {
+    // QUERY: Pure observation (no side effects)
+    // Returns Flow from local database
+    fun getNewsDetail(id: Int): Flow<NewsDetail?>
+    
+    // COMMAND: Explicit action (side effects allowed)
+    // Fetches from remote, updates local database
+    suspend fun refreshNewsDetail(id: Int): Result<Unit>
+}
+```
+
+**Repository Implementation:**
+```kotlin
+class NewsDetailRepositoryImpl(
+    private val remoteDataSource: NewsDetailDataSource.Remote,
+    private val localDataSource: NewsDetailDataSource.Local
+) : NewsDetailRepository {
+    
+    // QUERY: Only observe local data
+    override fun getNewsDetail(id: Int): Flow<NewsDetail?> {
+        return localDataSource.getNewsDetail(id)
+            .map { it?.toDomain() }
+    }
+    
+    // COMMAND: Fetch from network, update local
+    override suspend fun refreshNewsDetail(id: Int): Result<Unit> {
+        return try {
+            val response = remoteDataSource.getNewsDetail(id)
+            localDataSource.upsertNewsDetail(response.toEntity())
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            val error = (e as? AppException) ?: AppException.UnknownError(e.message, e)
+            Result.Error(error)
+        }
+    }
+}
+```
+
+**Benefits:**
+- No redundant network calls on re-collection
+- Explicit control over when data refreshes
+- Multiple collectors don't trigger multiple fetches
+- Perfect for Pull-to-Refresh scenarios
+- Prevents accidental fetches on screen rotation
+
+---
+
+### Standard Repository Pattern (Non-CQS)
+
+**Use for simple API calls without local storage:**
+
+```kotlin
+interface AuthRepository {
+    // Single operation: call API, return result
+    suspend fun login(email: String, password: String): Result<LoginModel>
+}
+
+class AuthRepositoryImpl(
+    private val remoteDataSource: AuthDataSource.Remote
+) : AuthRepository {
+    
+    override suspend fun login(email: String, password: String): Result<LoginModel> {
+        return try {
+            val response = remoteDataSource.login(LoginRequest(email, password))
+            Result.Success(response.toDomain())
+        } catch (e: Exception) {
+            val error = (e as? AppException) ?: AppException.UnknownError(e.message, e)
+            Result.Error(error)
+        }
+    }
+}
+```
+
+---
+
+## 7. Implementation Workflow
 
 1.  **Define Models**: Create all `request`, `response`, `entity` classes first.
 2.  **Define API Interface**: Create the contract.

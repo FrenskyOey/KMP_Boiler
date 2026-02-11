@@ -53,6 +53,44 @@ class GetNewsFeedUseCaseTest {
 }
 ```
 
+## Test Fake Naming Convention
+
+**Problem**: Multiple test files in the same package with duplicate `FakeRepository` class names cause compilation conflicts.
+
+**Solution**: Name fakes after the operation being tested.
+
+```kotlin
+// ❌ BAD: Generic name used in multiple test files
+// In GetNewsDetailUseCaseTest.kt
+class FakeNewsDetailRepository : NewsDetailRepository { ... }
+
+// In RefreshNewsDetailUseCaseTest.kt
+class FakeNewsDetailRepository : NewsDetailRepository { ... }
+// ^ COMPILATION ERROR: Duplicate class name!
+
+// ✅ GOOD: Operation-specific names
+// In GetNewsDetailUseCaseTest.kt
+class FakeGetNewsDetailRepository : NewsDetailRepository { ... }
+
+// In RefreshNewsDetailUseCaseTest.kt
+class FakeRefreshNewsDetailRepository : NewsDetailRepository { ... }
+```
+
+**Naming Pattern**: `Fake[Operation][Feature][Component]`
+
+**Examples**:
+- `FakeGetNewsDetailRepository`
+- `FakeRefreshNewsDetailRepository`
+- `FakeLoginRepository`
+- `FakeGetNewsFeedRepository`
+
+**Test File Organization**:
+- One test file per use case/operation
+- One fake repository per test file
+- Fake named after the operation being tested
+- Avoids naming conflicts in the same package
+
+
 # Code Review Checklist
 
 Before accepting code, verify:
