@@ -1,6 +1,7 @@
 package feature.news.data.api
 
 import core.domain.config.AppConfig
+import core.data.remote.model.BaseResponse
 import feature.news.data.model.response.ArticleDetailResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -11,7 +12,8 @@ class NewsDetailApiServiceImpl(
     private val httpClient: HttpClient,
     private val appConfig: AppConfig
 ) : NewsDetailApiService {
-    override suspend fun getNewsDetail(id: Long): ArticleDetailResponse {
+
+    override suspend fun getNewsDetail(id: Long): BaseResponse<ArticleDetailResponse>{
         val xid = id % 8
         val url = "${appConfig.baseApiUrl}details"
         return httpClient.get(url) {
