@@ -62,17 +62,26 @@ description: Generate a concise retrospective report analyzing today's work, ide
 #### Section 1: Summary (3-5 bullets)
 - What was accomplished today
 - Key metrics (files changed, tests added, features completed)
++ **Token usage**: ~X tokens this session
++ **Efficiency**: Y tokens per feature/fix
++ **Repeated patterns**: Z instructions given 3+ times
 
 #### Section 2: What Worked Well (3-5 bullets)
 - Successful patterns
 - Effective workflows/skills
 - Good decisions
++ **Skills that saved time**: [list with estimated time saved]
++ **Rules that prevented errors**: [list with what they caught]
 
 #### Section 3: Issues Encountered (3-5 bullets)
 - Bugs found
 - Process violations
 - Workflow gaps
 - Skill failures
++ **Token waste analysis**:
+  - Instructions repeated 3+ times: [list]
+  - Estimated tokens wasted: ~X
+  - Could be solved by: [skill/rule name]
 
 #### Section 4: Recommendations (prioritized)
 **HIGH PRIORITY** (do next session):
