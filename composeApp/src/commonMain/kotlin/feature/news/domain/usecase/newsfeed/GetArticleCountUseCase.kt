@@ -1,4 +1,4 @@
-package feature.news.domain.usecase
+package feature.news.domain.usecase.newsfeed
 
 import feature.news.domain.repository.NewsFeedRepository
 import kotlinx.coroutines.flow.Flow

@@ -1,7 +1,3 @@
----
-description: Detailed 4-phase protocol for implementing features (Requirement Clarification → Planning → Execution)
----
-
 # Feature Implementation Protocol
 
 **Trigger**: User requests a new feature or complex change.
@@ -10,98 +6,116 @@ description: Detailed 4-phase protocol for implementing features (Requirement Cl
 
 ---
 
-## Phase 0: Requirement Clarification (MANDATORY)
+## Session 1: Planning & Requirements
+
+### Phase 0: Requirement Clarification (MANDATORY)
 
 1. **Activate `clarify_requirements` skill**
 2. Ask mandatory questions
 3. **WAIT** for user responses
 
----
-
-## Phase 1: Planning
+### Phase 1: Planning
 
 1. **Create task.md** in artifacts directory
    - Break down feature into checklist items
    - Organize by layer (Domain → Data → UI → Integration)
 
-2. **Create plan files**:
-   - `feature/[name]/domain/domain-plan.md`
-   - `feature/[name]/data/data-plan.md`
-   - `feature/[name]/ui/ui-plan.md`
+2. **Create Persistent Plan Files (IN SOURCE TREE)**:
+   - Create these files within the project source directories (e.g. `src/commonMain/kotlin/feature/...`)
+   - **DO NOT** create them as temporary artifacts.
+   - Files:
+     - `feature/[name]/domain/domain-plan.md`
+     - `feature/[name]/data/data-plan.md`
+     - `feature/[name]/ui/ui-plan.md`
 
-3. **Request Review** - WAIT for approval
+3. **Request Review**:
+   - Present the plan files to the user.
+   - **WAIT** for approval.
 
----
-
-## Phase 1.5: Address User Concerns (If Raised)
+### Phase 1.5: Address User Concerns (If Raised)
 
 **Trigger**: User identifies issues with the plan.
 
-1. **Create `improvements_summary.md`**
+1. **Create `improvements_summary.md`** (Artifact)
    - For each concern: Problem → Solution → Code Examples → Impact
 
-2. **Common concerns**: Configuration changes, performance, security, edge cases
+2. **Request re-approval** - WAIT for approval
 
-3. **Request re-approval** - WAIT for approval
+3. **Update plans** if needed
 
-4. **Update plans** if needed
+### **STOP POINT**
+**Constraint**: Do NOT implement code in this session.
+**Action**: State: "Planning Complete. Please start a **new session/chat window** to implement Phase 2 (Domain). Reference `domain-plan.md`."
 
 ---
 
-## Phase 2: Domain Layer
+## Session 2: Domain Implementation
 
-**Trigger**: User approves domain-plan.md
+**Trigger**: New Session + "Implement Phase 2" (referencing `domain-plan.md`)
 
-1. Implement models (`domain/model/`)
-2. Implement repository interface (`domain/repository/`)
+### Phase 2: Domain Layer
 
-3. **TDD (MANDATORY)**:
+1. **Review Plan**: Read `feature/[name]/domain/domain-plan.md`.
+
+2. Implement models (`domain/model/`)
+3. Implement repository interface (`domain/repository/`)
+
+4. **TDD (MANDATORY)**:
    - Activate `tdd_implementation` skill
    - Write FAILING test for UseCase
    - Show test failure
    - Implement UseCase
    - Show test passing
 
-4. **Verify**: Run all domain tests, update task.md
+5. **Verify**: Run all domain tests, update task.md
+
+### **STOP POINT**
+**Constraint**: Do NOT implement Data layer in this session.
+**Action**: State: "Domain Complete. Please start a **new session/chat window** to implement Phase 3 (Data). Reference `data-plan.md`."
 
 ---
 
-## Phase 3: Data Layer
+## Session 3: Data Implementation
 
-**Trigger**: User approves data-plan.md
+**Trigger**: New Session + "Implement Phase 3" (referencing `data-plan.md`)
+
+### Phase 3: Data Layer
 
 **Pre-requisite**: Activate `data_implementation` skill
 
-1. Define structure:
+1. **Review Plan**: Read `feature/[name]/data/data-plan.md`.
+
+2. Define structure:
    - `data/model/` (entity, request, response, mapper)
    - `data/api/[Feature]ApiService`
    - `data/datasource/[Feature]DataSource`
 
-2. **TDD (MANDATORY)**:
+3. **TDD (MANDATORY)**:
    - Write FAILING test for Repository
    - Show test failure
    - Implement Repository + DataSources
    - Show tests passing
 
-3. **DI Registration**: Update `di/[Feature]Module.kt`
+4. **DI Registration**: Update `di/[Feature]Module.kt`
 
-4. **Verify**: Run all data tests, update task.md
+5. **Verify**: Run all data tests, update task.md
+
+### **STOP POINT**
+**Constraint**: Do NOT implement UI layer in this session.
+**Action**: State: "Data Complete. Please start a **new session/chat window** to implement Phase 4 (UI - Logic). Reference `ui-plan.md`."
 
 ---
 
-## Phase 4: UI Layer
+## Session 4: UI Logic & Specs
 
-> [!CAUTION]
-> **FORBIDDEN**: Modifying data/domain logic without user confirmation.
-> **SCOPE**: Only create/edit files in ui/presentation layer.
+**Trigger**: New Session + "Implement Phase 4.1/4.2" (referencing `ui-plan.md`)
 
 ### Phase 4.1: UI Design Specification
 
-1. **Verify Domain Readiness** - Check all UseCases exist
-2. **UI Requirements Session** - Ask about screens, flows, design system
-3. **Create Component Inventory** - List all needed components
-4. **Create `ui-spec.md`** with wireframes, component breakdown, state map
-5. **Request Review** - WAIT for approval
+1. **Review Plan**: Read `feature/[name]/ui/ui-plan.md`.
+2. **Review Domain**: Ensure use cases are ready.
+3. **Create `ui-spec.md`** (Artifact or Source File as requested): Detailed component breakdown, state map.
+4. **Request Review** - WAIT for approval
 
 ### Phase 4.2: State & ViewModel
 
@@ -115,13 +129,22 @@ description: Detailed 4-phase protocol for implementing features (Requirement Cl
    - Handle events
    - Manage effects
 
-3. **Request Approval** - WAIT
+3. **Request Approval & STOP**:
+   - WAIT for approval.
+   - **Constraint**: Do NOT implement Components/Screens in this session.
+   - **Action**: State: "UI Logic Complete. Please start a **new session/chat window** to implement Phase 4.3 (Components & Screens). Reference `ui-spec.md`."
+
+---
+
+## Session 5: UI Implementation
+
+**Trigger**: New Session + "Implement Phase 4.3" (referencing `ui-spec.md`)
 
 ### Phase 4.3: Component Implementation (Iterative)
 
 **Pre-requisite**: Activate `ui_implementation` skill
 
-**For EACH component**:
+**For EACH component defined in `ui-spec.md`**:
 
 1. **Announce**: "Now implementing: [ComponentName]"
 
@@ -182,15 +205,9 @@ description: Detailed 4-phase protocol for implementing features (Requirement Cl
 - `ui_implementation` - Phase 4.3
 - `ui_validation` - Phase 4.3
 
-**Key Artifacts**:
-- `task.md` - Progress tracking
-- `improvements_summary.md` - Address concerns
-- `domain-plan.md` - Domain layer spec
-- `data-plan.md` - Data layer spec
-- `ui-spec.md` - UI design spec
-
 **Mandatory Checkpoints**:
 - ✅ TDD for Domain & Data layers
 - ✅ UI validation for all components
 - ✅ DI registration on all platforms
 - ✅ User approval at each phase
+- ✅ **Start New Session** between major phases

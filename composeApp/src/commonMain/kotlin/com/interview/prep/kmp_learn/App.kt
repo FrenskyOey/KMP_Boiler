@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import core.theme.AppTheme
 import feature.dashboard.ui.DashboardScreen
+import feature.news.ui.detail.NewsDetailScreen
 import feature.onboarding.domain.repository.AuthRepository
 import feature.onboarding.ui.screen.LoginScreen
 import feature.settings.ui.SettingsAction
@@ -20,6 +21,8 @@ import feature.settings.ui.form.FormScreen
 import feature.settings.ui.navbar.NavbarScreen
 import feature.settings.ui.text.TextScreen
 import org.koin.compose.koinInject
+import androidx.navigation.toRoute
+import com.interview.prep.kmp_learn.navigation.AppRoute
 import core.domain.repository.SessionRepository
 import core.domain.repository.SessionState
 import kotlinx.coroutines.launch
@@ -39,7 +42,7 @@ fun App() {
         LaunchedEffect(sessionState) {
             when (sessionState) {
                 is SessionState.Valid -> {
-                    navController.navigate("dashboard") {
+                    navController.navigate(AppRoute.Dashboard) {
                         popUpTo(0) { inclusive = true }
                     }
                 }
@@ -47,7 +50,7 @@ fun App() {
                     // Only logout if we were previously logged in or checking (optimization)
                     // But effectively, Invalid means "Show Login"
                     authRepository.logout()
-                    navController.navigate("login") {
+                    navController.navigate(AppRoute.Login) {
                         popUpTo(0) { inclusive = true }
                     }
                 }
@@ -56,52 +59,64 @@ fun App() {
 
         NavHost(
             navController = navController,
-            startDestination = "login" // Default start, will be overridden by LaunchedEffect immediately if Valid
+            startDestination = AppRoute.Login
         ) {
-            composable("login") {
+            composable<AppRoute.Login> {
                 LoginScreen()
             }
 
-            composable("dashboard") {
+            composable<AppRoute.Dashboard> {
                 DashboardScreen(
                     onSettingsAction = { action ->
                         when (action) {
-                            SettingsAction.OpenColor -> navController.navigate("settings_color")
-                            SettingsAction.OpenText -> navController.navigate("settings_text")
-                            SettingsAction.OpenButtons -> navController.navigate("settings_button")
-                            SettingsAction.OpenForm -> navController.navigate("settings_form")
-                            SettingsAction.OpenNavBar -> navController.navigate("settings_navbar")
+                            SettingsAction.OpenColor -> navController.navigate(AppRoute.SettingsColor)
+                            SettingsAction.OpenText -> navController.navigate(AppRoute.SettingsText)
+                            SettingsAction.OpenButtons -> navController.navigate(AppRoute.SettingsButton)
+                            SettingsAction.OpenForm -> navController.navigate(AppRoute.SettingsForm)
+                            SettingsAction.OpenNavBar -> navController.navigate(AppRoute.SettingsNavbar)
                             SettingsAction.Logout -> {
                                 coroutineScope.launch {
                                     sessionRepository.invalidateSession()
                                 }
                             }
                         }
+                    },
+                    onArticleClick = { articleId, articleTitle ->
+                        navController.navigate(AppRoute.NewsDetail(articleId, articleTitle))
                     }
                 )
             }
 
-            composable("settings_color") {
+            composable<AppRoute.NewsDetail> { backStackEntry ->
+                val args = backStackEntry.toRoute<AppRoute.NewsDetail>()
+                NewsDetailScreen(
+                    articleId = args.articleId,
+                    articleTitle = args.articleTitle,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable<AppRoute.SettingsColor> {
                 ColorScreen(
                     onBackClick = { navController.popBackStack() }
                 )
             }
-            composable("settings_text") {
+            composable<AppRoute.SettingsText> {
                 TextScreen(
                     onBackClick = { navController.popBackStack() }
                 )
             }
-            composable("settings_button") {
+            composable<AppRoute.SettingsButton> {
                 ButtonScreen(
                     onBackClick = { navController.popBackStack() }
                 )
             }
-            composable("settings_form") {
+            composable<AppRoute.SettingsForm> {
                 FormScreen(
                     onBackClick = { navController.popBackStack() }
                 )
             }
-            composable("settings_navbar") {
+            composable<AppRoute.SettingsNavbar> {
                 NavbarScreen(
                     onBackClick = { navController.popBackStack() }
                 )
