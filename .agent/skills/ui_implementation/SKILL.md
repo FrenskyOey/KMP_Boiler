@@ -229,7 +229,95 @@ Would you like me to:
 ```
 
 
+
+
 ---
+
+## Component File Organization (MANDATORY)
+
+### Rule: One Component Per File
+
+**Reusable components MUST be in separate files in the `components/` folder.**
+
+**✅ CORRECT Structure**:
+```kotlin
+feature/news/ui/detail/
+├── NewsDetailScreen.kt          // Main screen composable only
+├── NewsDetailViewModel.kt
+└── components/
+    ├── NewsDetailHeader.kt      // @Composable fun NewsDetailHeader(...)
+    ├── NewsAuthor.kt             // @Composable fun NewsAuthor(...)
+    ├── NewsDetailTags.kt         // @Composable fun NewsDetailTags(...)
+    └── NewsContentItem.kt        // @Composable fun NewsContentItem(...)
+```
+
+**❌ WRONG - Everything in one file**:
+```kotlin
+// NewsDetailScreen.kt
+@Composable fun NewsDetailScreen() { ... }
+@Composable fun NewsDetailHeader() { ... }   // ❌ Should be components/NewsDetailHeader.kt
+@Composable fun NewsAuthor() { ... }         // ❌ Should be components/NewsAuthor.kt
+@Composable fun NewsDetailTags() { ... }     // ❌ Should be components/NewsDetailTags.kt
+```
+
+### When to Separate
+
+**Create separate component file if**:
+- Component is reusable (used >1 time)
+- Component is >50 lines
+- Component has complex logic
+- Component defined in `ui-spec.md`
+
+**Can stay inline in Screen file if**:
+- One-time use AND <30 lines
+- Simple wrapper (Box, Column with basic styling)
+
+### Implementation Protocol
+
+**During Phase 4.3 (Component Implementation)**:
+
+1. **Before writing any `@Composable`**:
+   - Check: Is this in the wireframe/ui-spec?
+   - If YES → Create `components/[ComponentName].kt`
+   - Announce: "Creating: `components/[ComponentName].kt`"
+
+2. **File Structure**:
+```kotlin
+// components/NewsDetailHeader.kt
+package feature.news.ui.detail.components
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import core.theme.*
+
+@Composable
+fun NewsDetailHeader(
+    imageUrl: String,
+    category: String,
+    modifier: Modifier = Modifier
+) {
+    // Implementation using design system
+}
+```
+
+3. **Never ask permission** for this organization - it's mandatory
+
+### Auto-Enforcement
+
+**If you detect**:
+```kotlin
+// In NewsDetailScreen.kt
+@Composable fun NewsDetailHeader() { ... }  // >50 lines
+```
+
+**Action**:
+1. Stop implementation
+2. State: "Moving `NewsDetailHeader` to separate file (follows component organization rules)"
+3. Create `components/NewsDetailHeader.kt`
+4. Continue
+
+---
+
 
 ## Quick Reference
 
@@ -251,6 +339,8 @@ Before completing any UI implementation, verify:
 - [ ] All selection controls use `Core*` variants
 - [ ] No hardcoded dp, sp, or Color values
 - [ ] Proper imports from `core.theme.*` and `core.components.*`
+- [ ] Components separated into `components/` folder (one per file)
+- [ ] Screen file contains only main screen composable
 - [ ] Asked user before adding any new design system elements
 - [ ] Updated this SKILL.md if new elements were added
 
