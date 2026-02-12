@@ -113,23 +113,67 @@
 ### Phase 4.1: UI Design Specification
 
 1. **Review Plan**: Read `feature/[name]/ui/ui-plan.md`.
-2. **Review Domain**: Ensure use cases are ready.
-3. **Create `ui-spec.md`** (Artifact or Source File as requested): Detailed component breakdown, state map.
-4. **Request Review** - WAIT for approval
+
+2. **🆕 Validate Domain Context** (MANDATORY):
+   - Read `feature/[name]/domain/model/*.kt` - List all domain models
+   - Read `feature/[name]/domain/repository/*.kt` - List all repositories
+   - Read `feature/[name]/domain/usecase/*.kt` - List all use cases
+   - **Output Summary**:
+     ```
+     Domain Context for [Feature]:
+     - Models: [list with key fields and types]
+     - Repositories: [list with method signatures]
+     - UseCases: [list with parameters and return types]
+     ```
+   - **Compare with ui-plan.md**: Flag any discrepancies (e.g., type mismatches, missing fields)
+   - **Ask User**: "Domain analysis complete. The UI will use [models/types]. Any concerns?"
+   - **WAIT** for confirmation
+
+3. **🆕 Interactive Wireframe Generation** (MANDATORY):
+   - **Activate `ui_wireframe_interview` skill**
+   - Guide user through component-by-component design interview
+   - Accept image uploads for visual references
+   - Generate component hierarchy and wireframe structure
+   - **Update `ui-plan.md`** with wireframe section
+   - **WAIT** for wireframe approval
+
+4. **Create `ui-spec.md`** (Artifact or Source File as requested):
+   - Use wireframe as skeleton structure
+   - Add detailed component specifications:
+     - Component file locations (`components/[Name].kt`)
+     - Data bindings (ViewModel state fields)
+     - Interactions/callbacks
+     - Design system usage (colors, spacing, typography)
+   - Include Component Implementation Map table
+
+5. **Request Review** - WAIT for approval
 
 ### Phase 4.2: State & ViewModel
 
-1. Implement state classes (`ui/state/`)
+**🔒 MANDATORY**: Activate `viewmodel_testing` skill (if exists)
+
+1. **Check Skills**:
+   - Does `viewmodel_testing` skill exist?
+   - If YES: Load and follow patterns
+   - If NO: Proceed with standard testing
+
+2. Implement state classes (`ui/state/`)
    - `[Feature]State.kt` (UI state)
    - `[Feature]Event.kt` (user actions)
    - `[Feature]Effect.kt` (one-time effects)
 
-2. Implement ViewModel (`ui/viewmodel/`)
+3. Implement ViewModel (`ui/viewmodel/`)
    - Wire up use cases
    - Handle events
    - Manage effects
 
-3. **Request Approval & STOP**:
+4. **🆕 Test ViewModel** (MANDATORY):
+   - Create `[Feature]ViewModelTest.kt`
+   - Follow `viewmodel_testing` skill patterns (if available)
+   - Test state updates, event handling, effect emissions
+   - Run tests and show passing
+
+5. **Request Approval & STOP**:
    - WAIT for approval.
    - **Constraint**: Do NOT implement Components/Screens in this session.
    - **Action**: State: "UI Logic Complete. Please start a **new session/chat window** to implement Phase 4.3 (Components & Screens). Reference `ui-spec.md`."
@@ -142,23 +186,32 @@
 
 ### Phase 4.3: Component Implementation (Iterative)
 
-**Pre-requisite**: Activate `ui_implementation` skill
+**🔒 MANDATORY**: Activate `ui_implementation` skill  
+**🔒 MANDATORY**: Prepare `ui_validation` skill for each component
 
 **For EACH component defined in `ui-spec.md`**:
 
-1. **Announce**: "Now implementing: [ComponentName]"
+1. **Load Skills**:
+   - Read `ui_implementation` skill (MUST exist)
+   - Prepare `ui_validation` skill
 
-2. **Implement**: Create `ui/components/[ComponentName].kt`
+2. **Announce**: "Now implementing: `components/[ComponentName].kt`"  
+   ☝️ Note: Always create in `components/` folder (one component per file)
 
-3. **Validate (MANDATORY)**:
-   - Activate `ui_validation` skill
-   - Scan for hardcoded values
+3. **Implement**: 
+   - Create `ui/components/[ComponentName].kt`
+   - Follow design system rules (no hardcoded values)
+   - Use wireframe specifications from `ui-spec.md`
+
+4. **Validate** (AUTOMATIC - not optional):
+   - Run `ui_validation` skill
+   - Scan for hardcoded colors, spacing, typography
    - Auto-fix violations
-   - State "UI Validation: [Pass/Fail]"
+   - State "UI Validation: [PASS/FAIL with fixes applied]"
 
-4. **Request Approval** - WAIT
+5. **Request Approval** - WAIT
 
-5. **Update task.md**
+6. **Update task.md**
 
 ### Phase 4.4: Screen Composition
 
