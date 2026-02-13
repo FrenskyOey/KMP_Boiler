@@ -14,19 +14,20 @@ fun ArticleResponse.toDomain(): Article {
     )
 }
 
-fun ArticleResponse.toEntity(): ArticleEntity {
+fun ArticleResponse.toEntity(createdAt: Long): ArticleEntity {
     return ArticleEntity(
-        id = id,
+        id = id.toLong(),
         title = title,
         content = content,
         imageUrl = imageUrl,
-        topic = topic
+        topic = topic,
+        createdAt = createdAt
     )
 }
 
 fun ArticleEntity.toDomain(): Article {
     return Article(
-        id = id.toLong(),
+        id = id,
         title = title,
         content = content,
         imageUrl = imageUrl,

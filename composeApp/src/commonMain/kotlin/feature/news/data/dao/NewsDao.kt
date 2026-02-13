@@ -1,22 +1,30 @@
 package feature.news.data.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Upsert
 import feature.news.data.model.entity.ArticleEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NewsDao {
-    @Query("SELECT * FROM article_entity")
-    fun getAllArticles(): Flow<List<ArticleEntity>>
 
-    @Upsert
-    suspend fun upsertArticles(articles: List<ArticleEntity>)
+    // Joined query to ensure order matches API response
+    @Query("""
+        SELECT * FROM articles 
+        INNER JOIN news_remote_keys ON articles.id = news_remote_keys.articleId 
+        ORDER BY news_remote_keys.orderIndex ASC 
+        LIMIT :limit
+    """)
+    fun getArticles(limit: Int): Flow<List<ArticleEntity>>
 
-    @Query("DELETE FROM article_entity")
-    suspend fun clearArticles()
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(articles: List<ArticleEntity>)
 
-    @Query("SELECT COUNT(*) FROM article_entity")
-    fun getArticleCount(): Flow<Int>
+    @Query("DELETE FROM articles")
+    suspend fun clearAll()
+
+    @Query("SELECT COUNT(*) FROM articles")
+    suspend fun getCount(): Int
 }

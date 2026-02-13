@@ -1,10 +1,9 @@
-package feature.news.data.testhelper
+package feature.news.data.api
 
 import core.data.remote.model.BaseListResponse
-import feature.news.data.datasource.NewsDataSource
 import feature.news.data.model.response.ArticleResponse
 
-class FakeNewsRemoteDataSource : NewsDataSource.Remote {
+class FakeNewsApiService : NewsApiService {
     
     var fetchResult: BaseListResponse<ArticleResponse>? = null
     var requestedKeyId: Int? = null

@@ -2,29 +2,54 @@ package feature.news.data.testhelper
 
 import feature.news.data.datasource.NewsDataSource
 import feature.news.data.model.entity.ArticleEntity
+import feature.news.data.model.entity.NewsRemoteKeysEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 class FakeNewsLocalDataSource : NewsDataSource.Local {
+
+    val articlesState = MutableStateFlow<List<ArticleEntity>>(emptyList())
+    val remoteKeys = mutableListOf<NewsRemoteKeysEntity>()
     
-    val savedArticles = mutableListOf<ArticleEntity>()
-    var count = 0
+    var clearArticlesCalled = false
+    var clearRemoteKeysCalled = false
 
-    override fun getAllArticles(): Flow<List<ArticleEntity>> {
-        return flowOf(savedArticles)
-    }
-
-    override fun getArticleCount(): Flow<Int> {
-        return flowOf(count)
+    override fun getArticles(limit: Int): Flow<List<ArticleEntity>> {
+        return articlesState.map { it.take(limit) }
     }
 
     override suspend fun upsertArticles(articles: List<ArticleEntity>) {
-        savedArticles.addAll(articles)
-        count += articles.size
+        val current = articlesState.value.toMutableList()
+        current.addAll(articles)
+        articlesState.value = current
     }
 
     override suspend fun clearArticles() {
-        savedArticles.clear()
-        count = 0
+        clearArticlesCalled = true
+        articlesState.value = emptyList()
+    }
+
+    override suspend fun getCount(): Int {
+        return articlesState.value.size
+    }
+
+    override suspend fun getRemoteKeys(articleId: Long): NewsRemoteKeysEntity? {
+        return remoteKeys.find { it.articleId == articleId }
+    }
+
+    override suspend fun getLastRemoteKey(): NewsRemoteKeysEntity? {
+        // Imitate DB behavior: usually based on orderIndex or insertion order
+        // For test simplicity, we assume the last added or last in list is sufficient if ordered
+        return remoteKeys.sortedBy { it.orderIndex }.lastOrNull()
+    }
+
+    override suspend fun upsertRemoteKeys(keys: List<NewsRemoteKeysEntity>) {
+        remoteKeys.addAll(keys)
+    }
+
+    override suspend fun clearRemoteKeys() {
+        clearRemoteKeysCalled = true
+        remoteKeys.clear()
     }
 }
