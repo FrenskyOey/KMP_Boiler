@@ -29,9 +29,31 @@ class NewsFeedViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
+        observeArticles()
+    }
+
+    private fun checkCacheAndRefreshIfNeeded() {
+        viewModelScope.launch {
+            // Only check cache if we have data
+            // If no data, let UI trigger initial load via loadNextPage
+            val isExpired = getNewsFeedUseCase.isCacheExpired()
+            if (_uiState.value.articles.isEmpty() || isExpired){
+                refresh()
+            }
+        }
+    }
+
+    private fun observeArticles() {
         viewModelScope.launch {
             getNewsFeedUseCase().collect { articles ->
-                _uiState.update { it.copy(articles = articles, isLoading = false) }
+                _uiState.update { 
+                    it.copy(
+                        articles = articles,
+                        isLoading = false,
+                        isPaginationLoading = false,
+                        isRefreshing = false
+                    ) 
+                }
             }
         }
     }
@@ -41,73 +63,74 @@ class NewsFeedViewModel(
             NewsIntent.LoadNextPage -> loadNextPage()
             NewsIntent.Refresh -> refresh()
             NewsIntent.Retry -> retry()
+            NewsIntent.CheckExpired -> checkCacheAndRefreshIfNeeded()
         }
     }
 
-    private fun loadNextPage() {
-        if (_uiState.value.isLoading || _uiState.value.isEndReached) return
+    private fun loadNextPage(forceLoad : Boolean = false) {
+        var shouldSkip = false
+
+        // Prevent concurrent pagination requests
+        // Only load next page if we have existing data
+        if (_uiState.value.articles.isEmpty() || _uiState.value.isPaginationLoading || _uiState.value.isEndReached || _uiState.value.isRefreshing){
+            shouldSkip = true
+        }
+
+        if(forceLoad){
+            shouldSkip = false
+        }
+
+        if(shouldSkip){
+            return
+        }
+
         viewModelScope.launch {
-            loadMoreNewsUseCase()
+            _uiState.update { it.copy(isPaginationLoading = true) }
+            
+            when (val result = loadMoreNewsUseCase()) {
+                is Result.Success -> {
+                    // Update isEndReached from pagination info
+                    _uiState.update { it.copy(isPaginationLoading = false, isEndReached = result.data.hasEndReached) }
+                    // Flow will emit updated list automatically
+                    // isPaginationLoading will be reset by observeArticles
+                }
+                is Result.Error -> {
+                    _uiState.update { it.copy(isPaginationLoading = false) }
+                    _effect.send(NewsEffect.ShowError(result.exception.message ?: "Failed to load more"))
+                }
+                is Result.Loading -> {
+                    // Already handled by isPaginationLoading = true above
+                }
+            }
         }
     }
 
     private fun refresh() {
-        _uiState.update { it.copy(page = 1, isEndReached = false, error = null, isRefresh = true)}
         viewModelScope.launch {
-            refreshNewsFeedUseCase()
+            _uiState.update { it.copy(isRefreshing = true, error = null, isEndReached = false) }
+            
+            when (val result = refreshNewsFeedUseCase()) {
+                is Result.Success -> {
+                    _uiState.update { it.copy(isRefreshing = false , isEndReached = result.data.hasEndReached) }
+                }
+                is Result.Error -> {
+                    _uiState.update { it.copy(isRefreshing = false) }
+                    _effect.send(NewsEffect.ShowError(result.exception.message ?: "Failed to refresh"))
+                }
+                is Result.Loading -> {
+                    // Already handled by isRefreshing = true above
+                }
+            }
         }
     }
 
     private fun retry() {
         if (_uiState.value.articles.isEmpty()) {
-            // loadPage(1)
+            // Retry initial load by refreshing
+            refresh()
         } else {
-            // loadPage(_uiState.value.page + 1)
+            // Retry pagination
+            loadNextPage(true)
         }
     }
-
-    /*
-    private fun loadPage(page: Int) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            
-            getNewsFeedUseCase(page).collect { result ->
-                when (result) {
-                    is Result.Loading -> {
-                        // Already handled by manual update, or can handle here
-                        _uiState.update { it.copy(isLoading = true) }
-                    }
-                    is Result.Success -> {
-                        val newArticles = result.data
-                        if (newArticles.isEmpty()) {
-                            _uiState.update { 
-                                it.copy(isLoading = false, isEndReached = true, isRefresh = false)
-                            }
-                        } else {
-                            val isRefreshed = _uiState.value.isRefresh
-
-                            _uiState.update { 
-                                it.copy(
-                                    isLoading = false,
-                                    articles = if (page == 1) newArticles else it.articles + newArticles,
-                                    page = page,
-                                    isRefresh = false
-                                ) 
-                            }
-                            if (isRefreshed) {
-                                _effect.send(NewsEffect.ShowToast("Refreshed"))
-                            }
-                        }
-                    }
-                    is Result.Error -> {
-                        _uiState.update { it.copy(isLoading = false, error = result.exception.message ?: "Unknown Error", isRefresh = false) }
-                        _effect.send(NewsEffect.ShowError(result.exception.message ?: "Error loading news"))
-                    }
-                }
-            }
-        }
-    }
-    */
-    
-    // private fun observeArticleCount() { ... } removed
 }

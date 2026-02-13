@@ -11,4 +11,8 @@ class GetNewsFeedUseCase(
     operator fun invoke(): Flow<List<Article>> {
         return repository.getArticles()
     }
+
+    suspend  fun isCacheExpired(): Boolean {
+        return repository.isCacheExpired()
+    }
 }

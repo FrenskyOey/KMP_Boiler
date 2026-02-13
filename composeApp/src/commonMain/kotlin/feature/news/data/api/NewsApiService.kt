@@ -1,7 +1,8 @@
 package feature.news.data.api
 
-import feature.news.data.model.response.ArticleListResponse
+import core.data.remote.model.BaseListResponse
+import feature.news.data.model.response.ArticleResponse
 
 interface NewsApiService{
-    suspend fun fetchArticles(page: Int): ArticleListResponse
+    suspend fun fetchArticles(keyId: Int?): BaseListResponse<ArticleResponse>
 }

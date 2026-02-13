@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "33f38ab2c57803085ee989fc3595589b",
+    "version": 2,
+    "identityHash": "375c6a613b07547fe20f2c6db77fd3f8",
     "entities": [
       {
         "tableName": "articles",
@@ -125,7 +125,7 @@
       },
       {
         "tableName": "news_remote_keys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`articleId` INTEGER NOT NULL, `prevKey` INTEGER, `nextKey` INTEGER, `createdAt` INTEGER NOT NULL, `orderIndex` INTEGER NOT NULL, PRIMARY KEY(`articleId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`articleId` INTEGER NOT NULL, `prevKey` INTEGER, `nextKey` INTEGER, `createdAt` INTEGER NOT NULL, `orderIndex` INTEGER NOT NULL, `isEndReached` INTEGER NOT NULL, PRIMARY KEY(`articleId`))",
         "fields": [
           {
             "fieldPath": "articleId",
@@ -154,6 +154,12 @@
             "columnName": "orderIndex",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "isEndReached",
+            "columnName": "isEndReached",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -166,7 +172,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '33f38ab2c57803085ee989fc3595589b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '375c6a613b07547fe20f2c6db77fd3f8')"
     ]
   }
 }

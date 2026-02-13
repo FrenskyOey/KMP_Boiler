@@ -51,6 +51,10 @@ fun NewsScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(NewsIntent.CheckExpired)
+    }
+
     // is refresh is happen when user pull to refresh where the article data should not be empty
 
     Column(
@@ -59,7 +63,7 @@ fun NewsScreen(
     ) {
         CoreBasicAppBar(title = "News")
         PullToRefreshBox(
-            isRefreshing = state.isRefresh,
+            isRefreshing = state.isRefreshing,
             onRefresh = { viewModel.onIntent(NewsIntent.Refresh) },
             modifier = Modifier.fillMaxSize()
         ) {
@@ -84,7 +88,7 @@ fun NewsScreen(
                 }
 
                 LaunchedEffect(shouldLoadNext.value) {
-                    if (shouldLoadNext.value && !state.isLoading && !state.isEndReached) {
+                    if (shouldLoadNext.value) {
                         viewModel.onIntent(NewsIntent.LoadNextPage)
                     }
                 }
@@ -102,7 +106,7 @@ fun NewsScreen(
                         )
                     }
 
-                    if (state.isLoading && !state.articles.isEmpty()) {
+                    if (state.isPaginationLoading) {
                         item {
                             Box(
                                 modifier = Modifier.fillMaxWidth().padding(16.dp),

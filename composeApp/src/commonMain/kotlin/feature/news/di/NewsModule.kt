@@ -3,9 +3,6 @@ package feature.news.di
 import core.data.local.database.AppDatabase
 import feature.news.data.api.NewsApiService
 import feature.news.data.api.NewsApiServiceImp
-import feature.news.data.datasource.NewsDataSource
-import feature.news.data.datasource.local.NewsLocalDataSourceImpl
-import feature.news.data.datasource.remote.NewsRemoteDataSourceImpl
 import feature.news.data.repository.NewsFeedRepositoryImpl
 import feature.news.domain.repository.NewsFeedRepository
 import feature.news.domain.usecase.newsfeed.GetNewsFeedUseCase
@@ -30,11 +27,13 @@ import org.koin.dsl.module
 val newsModule = module {
     // API
     single<NewsApiService>{ NewsApiServiceImp(get(), get()) }
-    single<NewsDataSource.Remote> { NewsRemoteDataSourceImpl(get()) }
-
     // Local
     single { get<AppDatabase>().newsDao() }
-    single<NewsDataSource.Local> { NewsLocalDataSourceImpl(get()) }
+    single { get<AppDatabase>().newsRemoteKeysDao() }
+
+    // Data Sources
+    single<feature.news.data.datasource.NewsDataSource.Remote> { feature.news.data.datasource.remote.NewsRemoteDataSourceImpl(get()) }
+    single<feature.news.data.datasource.NewsDataSource.Local> { feature.news.data.datasource.local.NewsLocalDataSourceImpl(get(), get()) }
 
     // Repository
     single<NewsFeedRepository> { 
@@ -49,7 +48,7 @@ val newsModule = module {
     factoryOf(::RefreshNewsFeedUseCase)
     factoryOf(::LoadMoreNewsUseCase)
 
-    factoryOf(::NewsFeedViewModel)
+    factory { NewsFeedViewModel(get(), get(), get()) }
     factoryOf(::SettingsViewModel)
 
     // --- News Detail ---
