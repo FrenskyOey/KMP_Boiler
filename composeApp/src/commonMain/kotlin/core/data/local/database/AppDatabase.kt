@@ -8,17 +8,20 @@ import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import feature.news.data.dao.NewsDao
 import feature.news.data.dao.NewsDetailDao
+import feature.news.data.dao.NewsRemoteKeysDao
 import feature.news.data.local.NewsDetailConverters
 import feature.news.data.model.entity.ArticleDetailEntity
 import feature.news.data.model.entity.ArticleEntity
+import feature.news.data.model.entity.NewsRemoteKeysEntity
 
 // Placeholder for now. We will add entities later.
-@Database(entities = [ArticleEntity::class, ArticleDetailEntity::class], version = 1)
+@Database(entities = [ArticleEntity::class, ArticleDetailEntity::class, NewsRemoteKeysEntity::class], version = 1)
 @TypeConverters(NewsDetailConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun newsDao(): NewsDao
     abstract fun newsDetailDao(): NewsDetailDao
+    abstract fun newsRemoteKeysDao(): NewsRemoteKeysDao
 }
 
 // Function to serve as a factory or similar if needed, or expected by DI
