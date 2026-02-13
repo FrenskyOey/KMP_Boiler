@@ -25,7 +25,7 @@ class NewsLocalDataSourceImpl(
     }
 
     override suspend fun getCount(): Int {
-        return newsDao.getCount()
+        return newsRemoteKeysDao.getCount()
     }
 
     override suspend fun getRemoteKeys(articleId: Long): NewsRemoteKeysEntity? {
@@ -34,6 +34,10 @@ class NewsLocalDataSourceImpl(
 
     override suspend fun getLastRemoteKey(): NewsRemoteKeysEntity? {
         return newsRemoteKeysDao.getLastRemoteKey()
+    }
+    
+    override suspend fun getRemoteKeyByOrderIndex(orderIndex: Int): NewsRemoteKeysEntity? {
+        return newsRemoteKeysDao.getRemoteKeyByOrderIndex(orderIndex)
     }
 
     override suspend fun upsertRemoteKeys(keys: List<NewsRemoteKeysEntity>) {

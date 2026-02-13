@@ -19,6 +19,7 @@ interface NewsDataSource {
         
         suspend fun getRemoteKeys(articleId: Long): NewsRemoteKeysEntity?
         suspend fun getLastRemoteKey(): NewsRemoteKeysEntity?
+        suspend fun getRemoteKeyByOrderIndex(orderIndex: Int): NewsRemoteKeysEntity?
         suspend fun upsertRemoteKeys(keys: List<NewsRemoteKeysEntity>)
         suspend fun clearRemoteKeys()
     }

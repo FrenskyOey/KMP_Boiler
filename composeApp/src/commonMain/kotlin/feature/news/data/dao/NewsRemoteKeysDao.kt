@@ -21,6 +21,12 @@ interface NewsRemoteKeysDao {
     @Query("SELECT * FROM news_remote_keys ORDER BY orderIndex DESC LIMIT 1")
     suspend fun getLastRemoteKey(): NewsRemoteKeysEntity?
     
+    @Query("SELECT * FROM news_remote_keys WHERE orderIndex = :orderIndex LIMIT 1")
+    suspend fun getRemoteKeyByOrderIndex(orderIndex: Int): NewsRemoteKeysEntity?
+    
     @Query("DELETE FROM news_remote_keys WHERE orderIndex > :orderIndex")
     suspend fun clearRemoteKeysAfter(orderIndex: Int)
+
+    @Query("SELECT COUNT(*) FROM news_remote_keys")
+    suspend fun getCount(): Int
 }

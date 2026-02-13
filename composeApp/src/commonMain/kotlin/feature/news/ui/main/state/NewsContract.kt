@@ -15,6 +15,7 @@ sealed interface NewsIntent {
     data object LoadNextPage : NewsIntent
     data object Refresh : NewsIntent
     data object Retry : NewsIntent
+    data object CheckExpired : NewsIntent
 }
 
 sealed interface NewsEffect {

@@ -48,7 +48,7 @@ val newsModule = module {
     factoryOf(::RefreshNewsFeedUseCase)
     factoryOf(::LoadMoreNewsUseCase)
 
-    factoryOf(::NewsFeedViewModel)
+    factory { NewsFeedViewModel(get(), get(), get()) }
     factoryOf(::SettingsViewModel)
 
     // --- News Detail ---

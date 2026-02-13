@@ -3,6 +3,7 @@ package feature.news.ui.main
 import core.domain.model.AppException
 import core.domain.model.Result
 import feature.news.domain.model.Article
+import feature.news.domain.model.PaginationInfo
 import feature.news.domain.repository.NewsFeedRepository
 import feature.news.domain.usecase.newsfeed.GetNewsFeedUseCase
 import feature.news.domain.usecase.newsfeed.LoadMoreNewsUseCase
@@ -110,7 +111,7 @@ class NewsFeedViewModelTest {
     @Test
     fun `refresh success updates isRefreshing state`() = runTest(testDispatcher) {
         // Given
-        fakeRepository.setRefreshResult(Result.Success(Unit))
+        fakeRepository.setRefreshResult(Result.Success(PaginationInfo(hasEndReached = false, currentLimit = 15)))
         
         // When
         viewModel.onIntent(NewsIntent.Refresh)
@@ -154,7 +155,7 @@ class NewsFeedViewModelTest {
     @Test
     fun `refresh resets isEndReached`() = runTest(testDispatcher) {
         // Given
-        fakeRepository.setLoadMoreResult(Result.Success(Unit))
+        fakeRepository.setLoadMoreResult(Result.Success(PaginationInfo(hasEndReached = false, currentLimit = 30)))
         
         // When
         viewModel.onIntent(NewsIntent.Refresh)
@@ -168,7 +169,7 @@ class NewsFeedViewModelTest {
     @Test
     fun `loadNextPage success updates isPaginationLoading state`() = runTest(testDispatcher) {
         // Given
-        fakeRepository.setLoadMoreResult(Result.Success(Unit))
+        fakeRepository.setLoadMoreResult(Result.Success(PaginationInfo(hasEndReached = false, currentLimit = 30)))
         val articles = listOf(
             Article(1, "Title 1", "Content 1", "url1", "Topic 1"),
             Article(2, "Title 2", "Content 2", "url2", "Topic 2")
@@ -196,7 +197,14 @@ class NewsFeedViewModelTest {
     
     @Test
     fun `loadNextPage error shows error effect and resets isPaginationLoading`() = runTest(testDispatcher) {
-        // Given
+        // Given - Set up initial articles so loadNextPage guard passes
+        val initialArticles = listOf(
+            Article(1, "Title 1", "Content 1", "url1", "Topic 1"),
+            Article(2, "Title 2", "Content 2", "url2", "Topic 2")
+        )
+        fakeRepository.emit(initialArticles)
+        advanceUntilIdle()
+        
         val error = AppException.NetworkError("Failed to load")
         fakeRepository.setLoadMoreResult(Result.Error(error))
         
@@ -222,7 +230,7 @@ class NewsFeedViewModelTest {
     @Test
     fun `loadNextPage does not trigger if isPaginationLoading is true`() = runTest(testDispatcher) {
         // Given
-        fakeRepository.setLoadMoreResult(Result.Success(Unit))
+        fakeRepository.setLoadMoreResult(Result.Success(PaginationInfo(hasEndReached = false, currentLimit = 30)))
         viewModel.onIntent(NewsIntent.LoadNextPage)
         
         // When - try to load again while first is in progress (before advanceUntilIdle)
@@ -241,7 +249,7 @@ class NewsFeedViewModelTest {
         fakeRepository.emit(emptyList())
         advanceUntilIdle()
         
-        fakeRepository.setRefreshResult(Result.Success(Unit))
+        fakeRepository.setRefreshResult(Result.Success(PaginationInfo(hasEndReached = false, currentLimit = 15)))
         
         // When
         viewModel.onIntent(NewsIntent.Retry)
@@ -258,7 +266,7 @@ class NewsFeedViewModelTest {
         fakeRepository.emit(articles)
         advanceUntilIdle()
         
-        fakeRepository.setLoadMoreResult(Result.Success(Unit))
+        fakeRepository.setLoadMoreResult(Result.Success(PaginationInfo(hasEndReached = false, currentLimit = 30)))
         
         // When
         viewModel.onIntent(NewsIntent.Retry)
@@ -273,8 +281,8 @@ class NewsFeedViewModelTest {
 
 class FakeNewsFeedRepository : NewsFeedRepository {
     private val articlesFlow = MutableStateFlow<List<Article>>(emptyList())
-    private var refreshResult: Result<Unit> = Result.Success(Unit)
-    private var loadMoreResult: Result<Unit> = Result.Success(Unit)
+    private var refreshResult: Result<PaginationInfo> = Result.Success(PaginationInfo(hasEndReached = false, currentLimit = 15))
+    private var loadMoreResult: Result<PaginationInfo> = Result.Success(PaginationInfo(hasEndReached = false, currentLimit = 30))
     
     var refreshCalled = false
     var refreshCount = 0
@@ -285,25 +293,27 @@ class FakeNewsFeedRepository : NewsFeedRepository {
         articlesFlow.value = articles
     }
     
-    fun setRefreshResult(result: Result<Unit>) {
+    fun setRefreshResult(result: Result<PaginationInfo>) {
         this.refreshResult = result
     }
     
-    fun setLoadMoreResult(result: Result<Unit>) {
+    fun setLoadMoreResult(result: Result<PaginationInfo>) {
         this.loadMoreResult = result
     }
     
     override fun getArticles(): Flow<List<Article>> = articlesFlow
     
-    override suspend fun refresh(): Result<Unit> {
+    override suspend fun refresh(): Result<PaginationInfo> {
         refreshCalled = true
         refreshCount++
         return refreshResult
     }
     
-    override suspend fun loadNextPage(): Result<Unit> {
+    override suspend fun loadNextPage(): Result<PaginationInfo> {
         loadMoreCalled = true
         loadMoreCount++
         return loadMoreResult
     }
+    
+    override suspend fun isCacheExpired(): Boolean = false
 }

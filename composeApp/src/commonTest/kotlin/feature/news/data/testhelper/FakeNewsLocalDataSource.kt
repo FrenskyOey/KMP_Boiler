@@ -39,9 +39,11 @@ class FakeNewsLocalDataSource : NewsDataSource.Local {
     }
 
     override suspend fun getLastRemoteKey(): NewsRemoteKeysEntity? {
-        // Imitate DB behavior: usually based on orderIndex or insertion order
-        // For test simplicity, we assume the last added or last in list is sufficient if ordered
-        return remoteKeys.sortedBy { it.orderIndex }.lastOrNull()
+        return remoteKeys.maxByOrNull { it.orderIndex }
+    }
+    
+    override suspend fun getRemoteKeyByOrderIndex(orderIndex: Int): NewsRemoteKeysEntity? {
+        return remoteKeys.find { it.orderIndex == orderIndex }
     }
 
     override suspend fun upsertRemoteKeys(keys: List<NewsRemoteKeysEntity>) {

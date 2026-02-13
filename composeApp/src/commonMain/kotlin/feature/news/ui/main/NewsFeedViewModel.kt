@@ -32,6 +32,17 @@ class NewsFeedViewModel(
         observeArticles()
     }
 
+    private fun checkCacheAndRefreshIfNeeded() {
+        viewModelScope.launch {
+            // Only check cache if we have data
+            // If no data, let UI trigger initial load via loadNextPage
+            val isExpired = getNewsFeedUseCase.isCacheExpired()
+            if (_uiState.value.articles.isEmpty() || isExpired){
+                refresh()
+            }
+        }
+    }
+
     private fun observeArticles() {
         viewModelScope.launch {
             getNewsFeedUseCase().collect { articles ->
@@ -52,18 +63,34 @@ class NewsFeedViewModel(
             NewsIntent.LoadNextPage -> loadNextPage()
             NewsIntent.Refresh -> refresh()
             NewsIntent.Retry -> retry()
+            NewsIntent.CheckExpired -> checkCacheAndRefreshIfNeeded()
         }
     }
 
-    private fun loadNextPage() {
+    private fun loadNextPage(forceLoad : Boolean = false) {
+        var shouldSkip = false
+
         // Prevent concurrent pagination requests
-        if (_uiState.value.isPaginationLoading || _uiState.value.isEndReached) return
-        
+        // Only load next page if we have existing data
+        if (_uiState.value.articles.isEmpty() || _uiState.value.isPaginationLoading || _uiState.value.isEndReached || _uiState.value.isRefreshing){
+            shouldSkip = true
+        }
+
+        if(forceLoad){
+            shouldSkip = false
+        }
+
+        if(shouldSkip){
+            return
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isPaginationLoading = true) }
             
             when (val result = loadMoreNewsUseCase()) {
                 is Result.Success -> {
+                    // Update isEndReached from pagination info
+                    _uiState.update { it.copy(isPaginationLoading = false, isEndReached = result.data.hasEndReached) }
                     // Flow will emit updated list automatically
                     // isPaginationLoading will be reset by observeArticles
                 }
@@ -84,8 +111,7 @@ class NewsFeedViewModel(
             
             when (val result = refreshNewsFeedUseCase()) {
                 is Result.Success -> {
-                    // Flow will emit updated list automatically
-                    // isRefreshing will be reset by observeArticles
+                    _uiState.update { it.copy(isRefreshing = false , isEndReached = result.data.hasEndReached) }
                 }
                 is Result.Error -> {
                     _uiState.update { it.copy(isRefreshing = false) }
@@ -104,7 +130,7 @@ class NewsFeedViewModel(
             refresh()
         } else {
             // Retry pagination
-            loadNextPage()
+            loadNextPage(true)
         }
     }
 }

@@ -10,5 +10,6 @@ data class NewsRemoteKeysEntity(
     val prevKey: Int?,
     val nextKey: Int?,
     val createdAt: Long = 0L,
-    val orderIndex: Int // Crucial for ordering from API
+    val orderIndex: Int, // Crucial for ordering from API
+    val isEndReached: Boolean = false // Track if this is the last page
 )

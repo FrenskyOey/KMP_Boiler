@@ -51,6 +51,10 @@ fun NewsScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(NewsIntent.CheckExpired)
+    }
+
     // is refresh is happen when user pull to refresh where the article data should not be empty
 
     Column(
@@ -84,7 +88,7 @@ fun NewsScreen(
                 }
 
                 LaunchedEffect(shouldLoadNext.value) {
-                    if (shouldLoadNext.value && !state.isPaginationLoading && !state.isEndReached) {
+                    if (shouldLoadNext.value) {
                         viewModel.onIntent(NewsIntent.LoadNextPage)
                     }
                 }

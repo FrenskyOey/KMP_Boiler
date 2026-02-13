@@ -24,10 +24,13 @@ class FakeNewsRemoteKeysDao : NewsRemoteKeysDao {
     }
 
     override suspend fun getLastRemoteKey(): NewsRemoteKeysEntity? {
-        // Order by orderIndex DESC LIMIT 1
         return keys.maxByOrNull { it.orderIndex }
     }
     
+    override suspend fun getRemoteKeyByOrderIndex(orderIndex: Int): NewsRemoteKeysEntity? {
+        return keys.find { it.orderIndex == orderIndex }
+    }
+
     override suspend fun clearRemoteKeysAfter(orderIndex: Int) {
         keys.removeAll { it.orderIndex > orderIndex }
     }

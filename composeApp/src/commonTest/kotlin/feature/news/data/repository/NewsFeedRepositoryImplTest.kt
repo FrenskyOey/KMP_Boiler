@@ -39,7 +39,7 @@ class NewsFeedRepositoryImplTest {
             ArticleResponse(1, "Title 1", "Content 1", "url1", "Topic 1"),
             ArticleResponse(2, "Title 2", "Content 2", "url2", "Topic 2")
         )
-        val pagination = Pagination(nextKeyId = 2, isEndReached = false)
+        val pagination = Pagination(nextKeyId = 2, hasNext = true)
         remoteDataSource.fetchResult = BaseListResponse(data = mockData, isSuccess = true, pagination = pagination)
 
         // When

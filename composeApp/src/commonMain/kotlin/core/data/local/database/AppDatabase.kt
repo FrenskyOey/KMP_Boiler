@@ -15,7 +15,7 @@ import feature.news.data.model.entity.ArticleEntity
 import feature.news.data.model.entity.NewsRemoteKeysEntity
 
 // Placeholder for now. We will add entities later.
-@Database(entities = [ArticleEntity::class, ArticleDetailEntity::class, NewsRemoteKeysEntity::class], version = 1)
+@Database(entities = [ArticleEntity::class, ArticleDetailEntity::class, NewsRemoteKeysEntity::class], version = 2)
 @TypeConverters(NewsDetailConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {

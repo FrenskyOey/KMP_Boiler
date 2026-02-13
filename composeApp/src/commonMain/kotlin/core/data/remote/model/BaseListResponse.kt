@@ -14,5 +14,5 @@ data class BaseListResponse<T>(
 @Serializable
 data class Pagination(
     @SerialName("key_id") val nextKeyId: Int?,
-    @SerialName("has_next") val isEndReached: Boolean
+    @SerialName("has_next") val hasNext: Boolean
 )

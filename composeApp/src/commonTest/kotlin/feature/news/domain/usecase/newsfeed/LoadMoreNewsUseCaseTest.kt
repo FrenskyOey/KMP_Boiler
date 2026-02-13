@@ -2,6 +2,7 @@ package feature.news.domain.usecase.newsfeed
 
 import core.domain.model.Result
 import feature.news.data.repository.FakeNewsFeedRepository
+import feature.news.domain.model.PaginationInfo
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -22,13 +23,14 @@ class LoadMoreNewsUseCaseTest {
     @Test
     fun `invoke should call repository loadNextPage`() = runTest {
         // Given
-        repository.loadMoreResult = Result.Success(Unit)
+        val paginationInfo = PaginationInfo(hasEndReached = false, currentLimit = 30)
+        repository.loadMoreResult = Result.Success(paginationInfo)
 
         // When
         val result = useCase()
 
         // Then
-        assertEquals(Result.Success(Unit), result)
+        assertEquals(Result.Success(paginationInfo), result)
         assertTrue(repository.loadMoreCalled)
     }
 }
