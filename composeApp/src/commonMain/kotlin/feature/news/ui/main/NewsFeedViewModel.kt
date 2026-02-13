@@ -3,8 +3,9 @@ package feature.news.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import core.domain.model.Result
-import feature.news.domain.usecase.newsfeed.GetArticleCountUseCase
 import feature.news.domain.usecase.newsfeed.GetNewsFeedUseCase
+import feature.news.domain.usecase.newsfeed.LoadMoreNewsUseCase
+import feature.news.domain.usecase.newsfeed.RefreshNewsFeedUseCase
 import feature.news.ui.main.state.NewsEffect
 import feature.news.ui.main.state.NewsIntent
 import feature.news.ui.main.state.NewsState
@@ -17,7 +18,8 @@ import kotlinx.coroutines.launch
 
 class NewsFeedViewModel(
     private val getNewsFeedUseCase: GetNewsFeedUseCase,
-    private val getArticleCountUseCase: GetArticleCountUseCase
+    private val refreshNewsFeedUseCase: RefreshNewsFeedUseCase,
+    private val loadMoreNewsUseCase: LoadMoreNewsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NewsState())
@@ -27,8 +29,11 @@ class NewsFeedViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
-        loadPage(1)
-        observeArticleCount()
+        viewModelScope.launch {
+            getNewsFeedUseCase().collect { articles ->
+                _uiState.update { it.copy(articles = articles, isLoading = false) }
+            }
+        }
     }
 
     fun onIntent(intent: NewsIntent) {
@@ -41,22 +46,27 @@ class NewsFeedViewModel(
 
     private fun loadNextPage() {
         if (_uiState.value.isLoading || _uiState.value.isEndReached) return
-        loadPage(_uiState.value.page + 1)
+        viewModelScope.launch {
+            loadMoreNewsUseCase()
+        }
     }
 
     private fun refresh() {
         _uiState.update { it.copy(page = 1, isEndReached = false, error = null, isRefresh = true)}
-        loadPage(1)
+        viewModelScope.launch {
+            refreshNewsFeedUseCase()
+        }
     }
 
     private fun retry() {
         if (_uiState.value.articles.isEmpty()) {
-            loadPage(1)
+            // loadPage(1)
         } else {
-            loadPage(_uiState.value.page + 1)
+            // loadPage(_uiState.value.page + 1)
         }
     }
 
+    /*
     private fun loadPage(page: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
@@ -97,12 +107,7 @@ class NewsFeedViewModel(
             }
         }
     }
+    */
     
-    private fun observeArticleCount() {
-        viewModelScope.launch {
-            getArticleCountUseCase().collect { count ->
-                 _uiState.update { it.copy(totalCachedCount = count) }
-            }
-        }
-    }
+    // private fun observeArticleCount() { ... } removed
 }

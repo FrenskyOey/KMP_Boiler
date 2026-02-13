@@ -8,8 +8,9 @@ import feature.news.data.datasource.local.NewsLocalDataSourceImpl
 import feature.news.data.datasource.remote.NewsRemoteDataSourceImpl
 import feature.news.data.repository.NewsFeedRepositoryImpl
 import feature.news.domain.repository.NewsFeedRepository
-import feature.news.domain.usecase.newsfeed.GetArticleCountUseCase
 import feature.news.domain.usecase.newsfeed.GetNewsFeedUseCase
+import feature.news.domain.usecase.newsfeed.LoadMoreNewsUseCase
+import feature.news.domain.usecase.newsfeed.RefreshNewsFeedUseCase
 import feature.news.domain.usecase.newsdetail.RefreshNewsDetailUseCase
 import feature.news.domain.usecase.newsdetail.GetNewsDetailUseCase
 import feature.news.ui.detail.NewsDetailViewModel
@@ -43,9 +44,10 @@ val newsModule = module {
         )
     }
     
-    // Use Cases
-    factory { GetNewsFeedUseCase(get()) }
-    factory { GetArticleCountUseCase(get()) }
+    // UseCases
+    factoryOf(::GetNewsFeedUseCase)
+    factoryOf(::RefreshNewsFeedUseCase)
+    factoryOf(::LoadMoreNewsUseCase)
 
     factoryOf(::NewsFeedViewModel)
     factoryOf(::SettingsViewModel)

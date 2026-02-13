@@ -5,6 +5,7 @@ import feature.news.domain.model.Article
 import kotlinx.coroutines.flow.Flow
 
 interface NewsFeedRepository {
-    fun getArticles(page: Int): Flow<Result<List<Article>>>
-    fun getArticleCount(): Flow<Int>
+    fun getArticles(): Flow<List<Article>>
+    suspend fun refresh(): Result<Unit>
+    suspend fun loadNextPage(): Result<Unit>
 }
