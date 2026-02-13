@@ -1,6 +1,5 @@
 package feature.news.data.repository
 
-import core.data.local.util.TransactionProvider
 import core.domain.model.AppException
 import core.domain.model.Result
 import feature.news.data.datasource.NewsDataSource
@@ -22,8 +21,7 @@ import kotlinx.datetime.Clock
 
 class NewsFeedRepositoryImpl(
     private val remoteDataSource: NewsDataSource.Remote,
-    private val localDataSource: NewsDataSource.Local,
-    private val transactionProvider: TransactionProvider
+    private val localDataSource: NewsDataSource.Local
 ) : NewsFeedRepository {
 
     // Helper to allow Flow collection to trigger re-fetches when limit changes
@@ -77,32 +75,31 @@ class NewsFeedRepositoryImpl(
             val response = remoteDataSource.fetchArticles(keyId = null)
             
             if (response.isSuccess && response.data != null) {
-                transactionProvider.runAsTransaction {
-                    // Smart Invalidation Check
-                    val firstId = response.data.firstOrNull()?.id?.toLong() ?: 0L
-                    val firstKey = localDataSource.getRemoteKeys(firstId)
-                    val isSameChain = firstKey?.nextKey == response.pagination?.nextKeyId
-                    
-                    if (!isSameChain) {
-                        // Clear key table due since history is not same anymore
-                        localDataSource.clearRemoteKeys()
-                    }
-
-                    // Insert Cache
-                    val articles = response.data.map { it.toEntity(createdAt = Clock.System.now().toEpochMilliseconds()) }
-                    val keys = response.data.mapIndexed { index, article ->
-                        NewsRemoteKeysEntity(
-                            articleId = article.id.toLong(),
-                            prevKey = null, // First page has no prev
-                            nextKey = response.pagination?.nextKeyId,
-                            createdAt = Clock.System.now().toEpochMilliseconds(),
-                            orderIndex = index // 0..14
-                        )
-                    }
-                    
-                    localDataSource.upsertArticles(articles)
-                    localDataSource.upsertRemoteKeys(keys)
+                // Smart Invalidation Check
+                val firstId = response.data.firstOrNull()?.id?.toLong() ?: 0L
+                val firstKey = localDataSource.getRemoteKeys(firstId)
+                val isSameChain = firstKey?.nextKey == response.pagination?.nextKeyId
+                
+                if (!isSameChain) {
+                    // Clear key table due since history is not same anymore
+                    localDataSource.clearRemoteKeys()
                 }
+
+                // Insert Cache
+                val articles = response.data.map { it.toEntity(createdAt = Clock.System.now().toEpochMilliseconds()) }
+                val keys = response.data.mapIndexed { index, article ->
+                    NewsRemoteKeysEntity(
+                        articleId = article.id.toLong(),
+                        prevKey = null, // First page has no prev
+                        nextKey = response.pagination?.nextKeyId,
+                        createdAt = Clock.System.now().toEpochMilliseconds(),
+                        orderIndex = index // 0..14
+                    )
+                }
+                
+                localDataSource.upsertArticles(articles)
+                localDataSource.upsertRemoteKeys(keys)
+                
                 Result.Success(Unit)
             } else {
                 Result.Error(AppException.UnknownError(errorMessage = response.errorMessage ?: "Unknown API Error"))
@@ -136,22 +133,21 @@ class NewsFeedRepositoryImpl(
             val response = remoteDataSource.fetchArticles(keyId = nextKey)
             
             if (response.isSuccess && response.data != null) {
-                transactionProvider.runAsTransaction {
-                    val startOrderIndex = lastRemoteKey.orderIndex + 1
-                    
-                    val articles = response.data.map { it.toEntity(createdAt = Clock.System.now().toEpochMilliseconds()) }
-                    val keys = response.data.mapIndexed { index, article ->
-                        NewsRemoteKeysEntity(
-                            articleId = article.id.toLong(),
-                            prevKey = null, 
-                            nextKey = response.pagination?.nextKeyId,
-                            createdAt = Clock.System.now().toEpochMilliseconds(),
-                            orderIndex = startOrderIndex + index
-                        )
-                    }
-                    localDataSource.upsertArticles(articles)
-                    localDataSource.upsertRemoteKeys(keys)
+                val startOrderIndex = lastRemoteKey.orderIndex + 1
+                
+                val articles = response.data.map { it.toEntity(createdAt = Clock.System.now().toEpochMilliseconds()) }
+                val keys = response.data.mapIndexed { index, article ->
+                    NewsRemoteKeysEntity(
+                        articleId = article.id.toLong(),
+                        prevKey = null, 
+                        nextKey = response.pagination?.nextKeyId,
+                        createdAt = Clock.System.now().toEpochMilliseconds(),
+                        orderIndex = startOrderIndex + index
+                    )
                 }
+                localDataSource.upsertArticles(articles)
+                localDataSource.upsertRemoteKeys(keys)
+                
                  // Increase limit to show new data
                 currentLimit.value += 15
                 Result.Success(Unit)

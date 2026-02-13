@@ -30,7 +30,6 @@ val newsModule = module {
     // Local
     single { get<AppDatabase>().newsDao() }
     single { get<AppDatabase>().newsRemoteKeysDao() }
-    single<core.data.local.util.TransactionProvider> { core.data.local.util.RoomTransactionProvider(get()) }
 
     // Data Sources
     single<feature.news.data.datasource.NewsDataSource.Remote> { feature.news.data.datasource.remote.NewsRemoteDataSourceImpl(get()) }
@@ -40,8 +39,7 @@ val newsModule = module {
     single<NewsFeedRepository> { 
         NewsFeedRepositoryImpl(
             remoteDataSource = get(),
-            localDataSource = get(),
-            transactionProvider = get()
+            localDataSource = get()
         )
     }
     

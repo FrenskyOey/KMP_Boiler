@@ -4,12 +4,11 @@ import feature.news.domain.model.Article
 
 data class NewsState(
     val articles: List<Article> = emptyList(),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,  // Initial loading
+    val isPaginationLoading: Boolean = false,  // Loading more items
+    val isRefreshing: Boolean = false,  // Pull-to-refresh
     val error: String? = null,
-    val page: Int = 1,
-    val isEndReached: Boolean = false,
-    val totalCachedCount: Int = 0,
-    val isRefresh: Boolean = false
+    val isEndReached: Boolean = false
 )
 
 sealed interface NewsIntent {

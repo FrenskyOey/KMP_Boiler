@@ -1,6 +1,5 @@
 package feature.news.data.repository
 
-import core.data.local.util.FakeTransactionProvider
 import core.data.remote.model.BaseListResponse
 import core.data.remote.model.Pagination
 import core.domain.model.Result
@@ -21,18 +20,15 @@ class NewsFeedRepositoryImplTest {
 
     private lateinit var remoteDataSource: FakeNewsRemoteDataSource
     private lateinit var localDataSource: FakeNewsLocalDataSource
-    private lateinit var transactionProvider: FakeTransactionProvider
     private lateinit var repository: NewsFeedRepositoryImpl
 
     @BeforeTest
     fun setup() {
         remoteDataSource = FakeNewsRemoteDataSource()
         localDataSource = FakeNewsLocalDataSource()
-        transactionProvider = FakeTransactionProvider()
         repository = NewsFeedRepositoryImpl(
             remoteDataSource = remoteDataSource,
-            localDataSource = localDataSource,
-            transactionProvider = transactionProvider
+            localDataSource = localDataSource
         )
     }
 
@@ -51,7 +47,6 @@ class NewsFeedRepositoryImplTest {
 
         // Then
         assertTrue(result is Result.Success, "Result should be Success")
-        assertTrue(transactionProvider.transactionCalled, "Transaction should be called")
         assertEquals(2, localDataSource.articlesState.value.size, "Article count mismatch")
         assertEquals(2, localDataSource.remoteKeys.size, "Keys count mismatch")
         // Verify keys
@@ -116,7 +111,6 @@ class NewsFeedRepositoryImplTest {
         // Then
         assertTrue(result is Result.Success, "Result should be Success")
         assertEquals(100, remoteDataSource.requestedKeyId, "Should request expected keyId")
-        assertTrue(transactionProvider.transactionCalled, "Transaction should be called")
         assertEquals(16, localDataSource.articlesState.value.size, "Should have 16 articles after fetch")
     }
 }

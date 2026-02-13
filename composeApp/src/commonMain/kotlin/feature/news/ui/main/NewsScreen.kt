@@ -59,7 +59,7 @@ fun NewsScreen(
     ) {
         CoreBasicAppBar(title = "News")
         PullToRefreshBox(
-            isRefreshing = state.isRefresh,
+            isRefreshing = state.isRefreshing,
             onRefresh = { viewModel.onIntent(NewsIntent.Refresh) },
             modifier = Modifier.fillMaxSize()
         ) {
@@ -84,7 +84,7 @@ fun NewsScreen(
                 }
 
                 LaunchedEffect(shouldLoadNext.value) {
-                    if (shouldLoadNext.value && !state.isLoading && !state.isEndReached) {
+                    if (shouldLoadNext.value && !state.isPaginationLoading && !state.isEndReached) {
                         viewModel.onIntent(NewsIntent.LoadNextPage)
                     }
                 }
@@ -102,7 +102,7 @@ fun NewsScreen(
                         )
                     }
 
-                    if (state.isLoading && !state.articles.isEmpty()) {
+                    if (state.isPaginationLoading) {
                         item {
                             Box(
                                 modifier = Modifier.fillMaxWidth().padding(16.dp),
