@@ -1,39 +1,48 @@
-# Domain Layer Implementation Plan - News Detail
+# Domain Layer Implementation Plan - News Feed Refactor
 
 ## Goal
-Implement the domain layer for the News Detail feature, enabling the retrieval of detailed article information.
+Update the Domain Layer to support `key_id` based pagination and Room-based Single Source of Truth (SSOT). The repository will now expose a `Flow` of articles instead of a suspend function returning a list.
 
 ## User Review Required
 > [!IMPORTANT]
-> - **New Model**: `NewsDetail` will be created separate from `Article` to accommodate the richer data structure (content list, author, etc.).
-> - **Logic**: The `xid` calculation (`id % 8`) will be handled in the Data Layer, not Domain. Domain simply requests by `id`.
+> The `NewsFeedRepository` interface is changing significantly.
+> - **Old**: `suspend fun getArticles(page: Int): Result<List<Article>>`
+> - **New**: 
+>   - `fun getArticles(): Flow<List<Article>>` (Observes Local DB)
+>   - `suspend fun refresh(): Result<Unit>` (Force API fetch & DB reset)
+>   - `suspend fun loadNextPage(): Result<Unit>` (Fetch next page & append)
 
 ## Proposed Changes
 
-### feature/news/domain
+### Clean Up Outdated Tests
+#### [DELETE] [GetNewsFeedUseCaseTest.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonTest/kotlin/feature/news/domain/usecase/newsfeed/GetNewsFeedUseCaseTest.kt)
+- The existing test assumes a `suspended List` return. It is invalid for the new `Flow` based approach.
+- We will delete this file and create a new TDD test file from scratch.
 
-#### [NEW] [NewsDetail.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/domain/model/NewsDetail.kt)
-- **Model**: `NewsDetail`
-- **Fields**:
-  - `id: Int`
-  - `title: String`
-  - `category: String`
-  - `image: String` (mapped from `image` or `imageUrl`)
-  - `author: Author` (Nested class with name, avatar, publication)
-  - `publishedAt: String`
-  - `readTime: Int`
-  - `content: List<NewsContent>` (Sealed Interface: Paragraph, Quote)
-  - `shareUrl: String`
+### Feature: News
 
-#### [NEW] [NewsDetailRepository.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/domain/repository/NewsDetailRepository.kt)
-- **Interface**: `NewsDetailRepository`
-- **Functions**:
-  - `getNewsDetail(id: Int): Flow<Result<NewsDetail>>`
+#### [MODIFY] [NewsFeedRepository.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/domain/repository/NewsFeedRepository.kt)
+- Change `getArticles` to return `Flow<List<Article>>`.
+- Add `suspend fun refresh(): Result<Unit>`
+- Add `suspend fun loadNextPage(): Result<Unit>`
+- Keep `getArticleCount(): Flow<Int>` (if still needed, or remove if redundant).
 
-#### [NEW] [GetNewsDetailUseCase.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/domain/usecase/GetNewsDetailUseCase.kt)
-- **UseCase**: `GetNewsDetailUseCase`
-- **Logic**: Invokes repository `getNewsDetail(id)`.
+#### [MODIFY] [GetNewsFeedUseCase.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/domain/usecase/newsfeed/GetNewsFeedUseCase.kt)
+- Update to call `repository.getArticles()`.
+- Return `Flow<List<Article>>`.
 
-## Verification
-- **Test**: `GetNewsDetailUseCaseTest` (TDD)
-- **Verify**: Ensure generic `Result` type is correctly propagated.
+#### [NEW] [RefeshNewsFeedUseCase.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/domain/usecase/newsfeed/RefeshNewsFeedUseCase.kt)
+- Encapsulate `repository.refresh()`.
+
+#### [NEW] [LoadMoreNewsUseCase.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/domain/usecase/newsfeed/LoadMoreNewsUseCase.kt)
+- Encapsulate `repository.loadNextPage()`.
+
+## Verification Plan
+
+### Automated Tests
+- **UnitTest**: `GetNewsFeedUseCaseTest` (Re-created)
+  - Verify it emits values from repository flow.
+- **UnitTest**: `NewsFeedRepositoryTest` (in Data phase, but interface defined here).
+
+### Manual Verification
+- None for Domain layer specifically (verified via Data layer integration).

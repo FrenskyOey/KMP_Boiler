@@ -1,47 +1,75 @@
-# Data Layer Implementation Plan - News Detail
+# Data Layer Implementation Plan - News Feed Refactor
 
 ## Goal
-Implement the data layer including Repository implementation, API integration, and local caching with Room.
-
-## User Review Required
-> [!IMPORTANT]
-> - **ID Transformation**: `xid = id % 8` logic will be implemented in `NewsDetailApiService` or `RemoteDataSource` before calling the API.
-> - **TypeConverters**: Custom TypeConverters will be created for `Author` and `List<NewsContent>` to store them as JSON strings in Room.
-> - **Cache Policy**: `NetworkBoundResource` strategy: Fetch from DB (show immediately) -> Fetch from Network -> Update DB.
+Implement Room-based caching with `key_id` pagination. The Data Layer will manage the logic of fetching from API, storing in DB, and emitting updates via Flow.
 
 ## Proposed Changes
 
-### feature/news/data
+### Clean Up Outdated Tests
+#### [DELETE] [NewsFeedRepositoryImplTest.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonTest/kotlin/feature/news/data/repository/NewsFeedRepositoryImplTest.kt)
+- The existing test assumes direct API-to-Domain mapping.
+- We will delete this and implement a new integration test for the CQS pattern (DB observation + API fetch).
 
-#### [NEW] [NewsDetailApiService.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/api/NewsDetailApiService.kt)
-- `getNewsDetail(id: Int): ArticleDetailResponse`
-- Endpoint: `v1/details?xid={id % 8}`
+### Database (Room)
+#### [NEW] [NewsRemoteKeysEntity.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/model/entity/NewsRemoteKeysEntity.kt)
+- Fields: `articleId` (PK), `prevKey`, `nextKey`, `createdAt`.
 
-#### [NEW] [NewsDetailDao.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/dao/NewsDetailDao.kt)
-- `@Query("SELECT * FROM article_detail WHERE id = :id")`
-- `@Upsert`
+#### [MODIFY] [ArticleEntity.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/model/entity/ArticleEntity.kt)
+- Ensure compatibility with new API response fields if any.
 
-#### [NEW] [ArticleDetailEntity.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/model/entity/ArticleDetailEntity.kt)
-- Table: `article_detail`
-- Columns: `id, title, category, image, author (json), publishedAt, readTime, content (json), shareUrl`
+#### [NEW] [NewsRemoteKeysDao.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/dao/NewsRemoteKeysDao.kt)
+- `insertAll(remoteKeys: List<NewsRemoteKeysEntity>)`
+- `getRemoteKeys(articleId: String): NewsRemoteKeysEntity?`
+- `clearRemoteKeys()`
 
-#### [NEW] [ArticleDetailResponse.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/model/response/ArticleDetailResponse.kt)
-- Matches JSON response structure.
-- `content` field is `List<ContentItemResponse>`
-
-#### [NEW] [NewsDetailRepositoryImpl.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/repository/NewsDetailRepositoryImpl.kt)
-- Implements `NewsDetailRepository`
-- Uses `NewsDetailDao` and `NewsDetailApiService`
-- Logic:
-  1. Emit local data from Dao.
-  2. If network logical (always refresh), fetch from API.
-  3. Map Response -> Entity -> Insert into Dao.
-  4. Emit updated local data.
+#### [MODIFY] [NewsDao.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/dao/NewsDao.kt)
+- `getAllArticles(): Flow<List<ArticleEntity>>`
+- `insertAll(articles: List<ArticleEntity>)`
+- `clearAll()`
 
 #### [MODIFY] [AppDatabase.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/core/data/local/database/AppDatabase.kt)
-- Add `ArticleDetailEntity` to `entities` list.
-- Add `abstract fun newsDetailDao(): NewsDetailDao`
+- Add `NewsRemoteKeysEntity` to entities.
+- Add `abstract fun newsRemoteKeysDao(): NewsRemoteKeysDao`.
 
-## Verification
-- **Test**: `NewsDetailRepositoryImplTest` (TDD)
-- **Verify**: Check `xid` modulo logic in tests. Verify JSON serialization for Room.
+### API
+#### [MODIFY] [NewsApiService.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/api/NewsApiService.kt)
+- Update `fetchArticles` to accept `keyId: Int` (or String) instead of `page`.
+- Return response with `pagination` object containing `next_key`.
+
+#### [MODIFY] [ArticleListResponse.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/model/response/ArticleListResponse.kt)
+- Update structure to match new JSON (include `pagination` field).
+
+### Repository
+#### [MODIFY] [NewsFeedRepositoryImpl.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/data/repository/NewsFeedRepositoryImpl.kt)
+- **Dependencies**: `NewsApiService`, `NewsDao`, `NewsRemoteKeysDao`, `AppDatabase` (for transactions).
+- **Logic**:
+  - `getArticles()`: Returns `newsDao.getAllArticles().map { ... }`.
+  - `refresh()`:
+    - Check usage timestamp (if needed for smart refresh, otherwise force).
+    - Fetch API `key_id=0`.
+    - Transaction: Clear tables -> Insert Keys -> Insert Articles.
+  - `loadNextPage()`:
+    - Get last item from DB.
+    - Get corresponding RemoteKey.
+    - If `nextKey` is null, return (End of List).
+    - Fetch API `nextKey`.
+    - Transaction: Insert Keys -> Insert Articles.
+
+### DI
+#### [MODIFY] [NewsModule.kt](file:///Users/frenskylee/Documents/git/kmpBoiler/composeApp/src/commonMain/kotlin/feature/news/di/NewsModule.kt)
+- Provide `NewsRemoteKeysDao`.
+- Update `NewsFeedRepositoryImpl` parameters.
+
+## Verification Plan
+
+### Automated Tests
+- **IntegrationTest**: `NewsFeedRepositoryImplTest`
+  - Mock API and DB.
+  - Test `refresh()` clears DB and inserts new data.
+  - Test `loadNextPage()` appends data.
+  - Test `getArticles()` emits updates.
+
+### Manual Verification
+- **Offline Mode**: Turn off network, open app. Should see cached data.
+- **Refresh**: Pull to refresh should update data.
+- **Pagination**: Scroll to bottom, should load more items.

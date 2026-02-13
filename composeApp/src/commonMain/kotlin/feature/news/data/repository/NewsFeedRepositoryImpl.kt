@@ -15,20 +15,18 @@ class NewsFeedRepositoryImpl(
     private val localDataSource: NewsDataSource.Local
 ) : NewsFeedRepository {
 
-    override fun getArticles(page: Int): Flow<Result<List<Article>>> = flow {
-        emit(Result.Loading)
-        try {
-            val remoteArticles = remoteDataSource.fetchArticles(page)
-            localDataSource.upsertArticles(remoteArticles.map { it.toEntity() })
-            val domainArticles = remoteArticles.map { it.toDomain() }
-            emit(Result.Success(domainArticles))
-        } catch (e: Exception) {
-            val error = ApiErrorHandler.handleError(e)
-            emit(Result.Error(error))
-        }
+    override fun getArticles(): Flow<List<Article>> = flow {
+        // TODO: Implement valid logic in Data Layer
+        emit(emptyList())
     }
 
-    override fun getArticleCount(): Flow<Int> {
-        return localDataSource.getArticleCount()
+    override suspend fun refresh(): Result<Unit> {
+        // TODO: Implement valid logic in Data Layer
+        return Result.Success(Unit)
+    }
+
+    override suspend fun loadNextPage(): Result<Unit> {
+        // TODO: Implement valid logic in Data Layer
+        return Result.Success(Unit)
     }
 }

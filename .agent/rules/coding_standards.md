@@ -54,6 +54,76 @@ sealed class NewsException : Exception()  // Should use core AppException
 
 ---
 
+## API Response Pattern
+
+### Always Use BaseResponse
+
+All API endpoints return responses wrapped in `BaseResponse<T>` from `core.data.remote.model`. This provides a consistent structure with a `data` field and an `isSuccess` flag.
+
+```kotlin
+// API Response Structure
+@Serializable
+data class BaseResponse<T>(
+    @SerialName("data") val data: T,
+    @SerialName("is_success") val isSuccess: Boolean
+)
+```
+
+**API Service Interface:**
+
+```kotlin
+// CORRECT - Return BaseResponse<T>
+interface NewsDetailApiService {
+    suspend fun getNewsDetail(id: Int): BaseResponse<ArticleDetailResponse>
+}
+```
+
+**API Service Implementation:**
+
+```kotlin
+// CORRECT - Ktor will deserialize into BaseResponse
+class NewsDetailApiServiceImpl(
+    private val httpClient: HttpClient,
+    private val appConfig: AppConfig
+) : NewsDetailApiService {
+    override suspend fun getNewsDetail(id: Int): BaseResponse<ArticleDetailResponse> {
+        return httpClient.get("${appConfig.baseApiUrl}details") {
+            parameter("id", id)
+        }.body()
+    }
+}
+```
+
+**Remote Data Source:**
+
+```kotlin
+// CORRECT - Unwrap BaseResponse and check isSuccess
+class NewsDetailRemoteDataSourceImpl(
+    private val apiService: NewsDetailApiService
+) : NewsDetailDataSource.Remote {
+    override suspend fun getNewsDetail(id: Int): ArticleDetailResponse {
+        return try {
+            val response = apiService.getNewsDetail(id)
+            if (response.isSuccess) {
+                response.data
+            } else {
+                throw AppException.UnknownError("API request failed with is_success=false")
+            }
+        } catch (e: Exception) {
+            throw ApiErrorHandler.handleError(e)
+        }
+    }
+}
+```
+
+**Key Points:**
+- API Service returns `BaseResponse<T>` where `T` is your response DTO
+- Remote Data Source unwraps the response and validates `isSuccess`
+- If `isSuccess` is `false`, throw an appropriate `AppException`
+- Always catch exceptions and use `ApiErrorHandler.handleError(e)`
+
+---
+
 ## Code Quality Rules
 
 ### Readable and Well-Named Code

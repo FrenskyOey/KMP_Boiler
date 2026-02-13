@@ -1,61 +1,46 @@
 package feature.news.domain.usecase.newsdetail
 
-import feature.news.domain.model.NewsDetail
+import feature.news.data.repository.FakeNewsDetailRepository
 import feature.news.domain.model.NewsContent
-import feature.news.domain.repository.NewsDetailRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.single
+import feature.news.domain.model.NewsDetail
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import core.domain.model.Result
 
 class GetNewsDetailUseCaseTest {
 
-    private val fakeRepository = FakeGetNewsDetailRepository()
-    private val useCase = GetNewsDetailUseCase(fakeRepository)
+    private lateinit var repository: FakeNewsDetailRepository
+    private lateinit var useCase: GetNewsDetailUseCase
+
+    @BeforeTest
+    fun setup() {
+        repository = FakeNewsDetailRepository()
+        useCase = GetNewsDetailUseCase(repository)
+    }
 
     @Test
-    fun `invoke returns flow from repository`() = runTest {
+    fun `invoke should return flow from repository`() = runTest {
         // Given
-        val newsDetail = NewsDetail(
+        val detail = NewsDetail(
             id = 1,
-            title = "Test Article",
-            category = "Tech",
+            title = "Test Detail",
+            category = "TECH",
             image = "url",
-            author = NewsDetail.Author("Author", "Avatar", "Pub"),
+            author = NewsDetail.Author("Author", "avatar", "pub"),
             publishedAt = "2024-01-01",
             readTime = 5,
-            content = listOf(
-                NewsContent.Paragraph("Content"),
-                NewsContent.Quote(text = "Quote text", highlighted = true, emphasis = true)
-            ),
-            tags = null,
-            shareUrl = "shareUrl"
+            content = listOf(NewsContent.Paragraph("Content")),
+            tags = listOf("Tag"),
+            shareUrl = "share"
         )
-        fakeRepository.setData(newsDetail)
+        repository.emitNewsDetail(1, detail)
 
         // When
-        val result = useCase(1).single()
+        val result = useCase(1).first()
 
         // Then
-        assertEquals(newsDetail, result)
-    }
-}
-
-class FakeGetNewsDetailRepository : NewsDetailRepository {
-    private var data: NewsDetail? = null
-
-    fun setData(newsDetail: NewsDetail?) {
-        this.data = newsDetail
-    }
-
-    override fun getNewsDetail(id: Int): Flow<NewsDetail?> {
-        return flowOf(data)
-    }
-
-    override suspend fun refreshNewsDetail(id: Int): Result<Unit> {
-        return Result.Success(Unit)
+        assertEquals(detail, result)
     }
 }

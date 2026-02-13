@@ -1,24 +1,26 @@
 package feature.news.domain.usecase.newsfeed
 
-import core.domain.model.Result
-import core.domain.model.AppException
+import feature.news.data.repository.FakeNewsFeedRepository
 import feature.news.domain.model.Article
-import feature.news.domain.repository.NewsFeedRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class GetNewsFeedUseCaseTest {
 
-    private val fakeRepository = FakeNewsFeedRepository()
-    private val useCase = GetNewsFeedUseCase(fakeRepository)
+    private lateinit var repository: FakeNewsFeedRepository
+    private lateinit var useCase: GetNewsFeedUseCase
+
+    @BeforeTest
+    fun setup() {
+        repository = FakeNewsFeedRepository()
+        useCase = GetNewsFeedUseCase(repository)
+    }
 
     @Test
-    fun `invoke returns success result from repository`() = runTest {
+    fun `invoke should return flow from repository`() = runTest {
         // Given
         val articles = listOf(
             Article(
@@ -26,64 +28,15 @@ class GetNewsFeedUseCaseTest {
                 title = "Test Article",
                 content = "Content",
                 imageUrl = "url",
-                topic = "tech"
+                topic = "TECH"
             )
         )
-        fakeRepository.setReturnData(Result.Success(articles))
+        repository.emitArticles(articles)
 
         // When
-        val result = useCase(1).single()
+        val result = useCase().first()
 
         // Then
-        assertTrue(result is Result.Success)
-        assertEquals(articles, result.data)
+        assertEquals(articles, result)
     }
-
-    @Test
-    fun `invoke returns error result from repository`() = runTest {
-        // Given
-        val error = AppException.NetworkError("Network failure")
-        fakeRepository.setReturnData(Result.Error(error))
-
-        // When
-        val result = useCase(1).single()
-
-        // Then
-        assertTrue(result is Result.Error)
-        assertEquals(error, result.exception)
-    }
-
-    @Test
-    fun `invoke passes correct page to repository`() = runTest {
-        // Given
-        fakeRepository.setReturnData(Result.Success(emptyList()))
-
-        // When
-        useCase(2).single()
-
-        // Then
-        assertEquals(2, fakeRepository.lastRequestedPage)
-    }
-}
-
-class FakeNewsFeedRepository : NewsFeedRepository {
-    private var result: Result<List<Article>> = Result.Success(emptyList())
-    var lastRequestedPage: Int = -1
-
-    private var count: Int = 0
-
-    fun setReturnData(result: Result<List<Article>>) {
-        this.result = result
-    }
-
-    fun setCountData(count: Int) {
-        this.count = count
-    }
-
-    override fun getArticles(page: Int): Flow<Result<List<Article>>> {
-        lastRequestedPage = page
-        return flowOf(result)
-    }
-    
-    override fun getArticleCount(): Flow<Int> = flowOf(count)
 }

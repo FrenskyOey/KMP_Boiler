@@ -1,3 +1,7 @@
+---
+description: Implement feature with Clean Architectire
+---
+
 # Feature Implementation Protocol
 
 **Trigger**: User requests a new feature or complex change.
