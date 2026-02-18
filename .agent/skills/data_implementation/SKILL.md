@@ -222,3 +222,32 @@ class AuthRepositoryImpl(
     - `RepositoryImpl`
     - `Mappers`
 6.  **DI**: Register all in `[Feature]Module`.
+
+---
+
+## 8. Interface Change Propagation
+
+**Trigger**: Any time you add, remove, or rename a method on a DAO or DataSource interface.
+
+When an interface changes, update **all** of the following in order — missing any one causes compilation errors:
+
+| # | File | Action |
+|---|---|---|
+| 1 | `*Dao.kt` | Add/update the `@Query` or `@Insert` method |
+| 2 | `[Name]DataSource.kt` | Add/update the method on `Local` or `Remote` interface |
+| 3 | `[Name]LocalDataSourceImpl.kt` | Implement the new method, delegate to DAO |
+| 4 | `FakeNewsRemoteKeysDao.kt` (test) | Add/update in-memory implementation |
+| 5 | `Fake[Name]LocalDataSource.kt` (test) | Add/update in-memory implementation |
+| 6 | `[Name]RepositoryImplTest.kt` | Update any tests that depend on the changed method |
+
+**Example** — adding `getRemoteKeyByOrderIndex(orderIndex: Int)`:
+```
+1. NewsRemoteKeysDao          → add @Query
+2. NewsDataSource.Local       → add method to interface
+3. NewsLocalDataSourceImpl    → implement, delegate to DAO
+4. FakeNewsRemoteKeysDao      → implement with in-memory list lookup
+5. FakeNewsLocalDataSource    → implement, delegate to fake DAO
+6. NewsFeedRepositoryImplTest → update tests using the new method
+```
+
+> ⚠️ Never leave a fake implementation unimplemented (throwing `NotImplementedError`). Fakes must behave correctly for tests to be meaningful.

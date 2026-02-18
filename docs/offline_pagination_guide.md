@@ -38,17 +38,18 @@ data class ArticleEntity(
 data class NewsRemoteKeysEntity(
     @PrimaryKey val articleId: Long,
     val prevKey: Int?,
-    val nextKey: Int?,       // Key for next page
-    val createdAt: Long,     // Timestamp for cache expiry
-    val orderIndex: Int      // Preserves API order
+    val nextKey: Int?,
+    val createdAt: Long,
+    val orderIndex: Int,           // Preserves API order (1-based)
+    val isEndReached: Boolean = false  // true only on last article of last page
 )
 ```
 
 **Why Remote Keys?**
 - Tracks pagination state per item
 - Maintains correct order from API via `orderIndex`
+- `isEndReached` stored per-article enables accurate end detection by position
 - Enables smart cache invalidation
-- Supports bidirectional pagination (future)
 
 ### 2. API Response
 
@@ -63,8 +64,8 @@ data class BaseListResponse<T>(
 
 @Serializable
 data class Pagination(
-    val nextKeyId: Int?,      // Key for next page (null = end)
-    val isEndReached: Boolean
+    @SerialName("next_key_id") val nextKey: Int?,
+    @SerialName("has_next") val hasNext: Boolean  // false = end of list
 )
 ```
 
@@ -72,10 +73,16 @@ data class Pagination(
 
 ```kotlin
 interface NewsFeedRepository {
-    fun getArticles(): Flow<List<Article>>  // Query: Observe cache
-    suspend fun refresh(): Result<Unit>      // Command: Refresh first page
-    suspend fun loadNextPage(): Result<Unit> // Command: Load more
+    fun getArticles(): Flow<List<Article>>             // Query: observe cache
+    suspend fun refresh(): Result<PaginationInfo>      // Command: refresh first page
+    suspend fun loadNextPage(): Result<PaginationInfo> // Command: load more
+    suspend fun isCacheExpired(): Boolean              // Query: check cache freshness
 }
+
+data class PaginationInfo(
+    val hasEndReached: Boolean,
+    val currentLimit: Int
+)
 ```
 
 ---
@@ -152,86 +159,117 @@ sequenceDiagram
 
 ## Key Mechanisms
 
-### 1. Stale-While-Revalidate
+### 1. Pure Flow — No Side Effects
+
+The `getArticles()` Flow is a **pure query** — it never triggers network calls or refreshes. Cache checking is an explicit ViewModel intent (UDF).
 
 ```kotlin
-override fun getArticles(): Flow<List<Article>> = flow {
-    // Launch background cache check (non-blocking)
-    val scope = CoroutineScope(Dispatchers.Default)
-    scope.launch {
-        checkCacheExpiry()  // Refreshes if >1 hour old
-    }
-
-    // Immediately emit cached data
-    emitAll(
-        currentLimit.flatMapLatest { limit ->
-            localDataSource.getArticles(limit).map { it.toDomain() }
+// Repository: pure query
+override fun getArticles(): Flow<List<Article>> {
+    return currentLimit.flatMapLatest { limit ->
+        localDataSource.getArticles(limit).map { entities ->
+            entities.map { it.toDomain() }
         }
-    )
+    }
+}
+
+// Repository: separate cache check method
+override suspend fun isCacheExpired(): Boolean {
+    val lastKey = localDataSource.getLastRemoteKey() ?: return true
+    val timeout = 60 * 60 * 1000L // 1 hour
+    return (Clock.System.now().toEpochMilliseconds() - lastKey.createdAt > timeout)
 }
 ```
 
-**Benefits:**
-- UI shows data instantly
-- Background refresh updates cache
-- No loading spinners on subsequent visits
+```kotlin
+// ViewModel: cache check is an explicit intent
+NewsIntent.CheckExpired -> checkCacheAndRefreshIfNeeded()
+
+private fun checkCacheAndRefreshIfNeeded() {
+    viewModelScope.launch {
+        val isExpired = getNewsFeedUseCase.isCacheExpired()
+        if (_uiState.value.articles.isEmpty() || isExpired) refresh()
+    }
+}
+```
+
+**Why no auto-refresh in Flow?** Hiding a network call inside a Flow (query) violates UDF and causes race conditions — the Flow emits while a concurrent `loadNextPage()` is also running.
 
 ### 2. Smart Invalidation
 
 ```kotlin
-override suspend fun refresh(): Result<Unit> {
+override suspend fun refresh(): Result<PaginationInfo> {
     val response = remoteDataSource.fetchArticles(keyId = null)
-    
+
     if (response.isSuccess && response.data != null) {
-        transactionProvider.runAsTransaction {
-            val firstId = response.data.first().id
-            val firstKey = localDataSource.getRemoteKeys(firstId)
-            val isSameChain = firstKey?.nextKey == response.pagination?.nextKeyId
-            
-            if (!isSameChain) {
-                // Chain broken: clear keys only (articles preserved via upsert)
-                localDataSource.clearRemoteKeys()
-            }
-            
-            // Upsert new data
-            localDataSource.upsertArticles(articles)
-            localDataSource.upsertRemoteKeys(keys)
+        val firstId = response.data.first().id
+        val firstKey = localDataSource.getRemoteKeys(firstId)
+        val isSameChain = firstKey?.nextKey == response.pagination?.nextKey
+
+        if (!isSameChain) {
+            localDataSource.clearRemoteKeys()  // Reset pagination chain
         }
+
+        localDataSource.upsertArticles(articles)
+        localDataSource.upsertRemoteKeys(keys)
+        currentLimit.value = 15  // Reset limit on refresh
     }
+    return Result.Success(PaginationInfo(hasEndReached = false, currentLimit = currentLimit.value))
 }
 ```
+
+> **Note**: Room KMP DAO operations with `OnConflictStrategy.REPLACE` are already atomic. No manual transaction wrapper is needed.
 
 **Why Clear Keys Only?**
 - Articles are upserted (replaced if ID exists)
-- Keys determine pagination state
-- Clearing keys resets pagination without losing article data
+- Keys determine pagination state — clearing them resets pagination without losing article data
 
-### 3. Efficient Pagination
+### 3. Efficient Pagination with Accurate End Detection
 
 ```kotlin
-override suspend fun loadNextPage(): Result<Unit> {
+override suspend fun loadNextPage(): Result<PaginationInfo> {
     val limit = currentLimit.value
     val dbCount = localDataSource.getCount()
 
-    // Optimization: If DB has more data, just increase limit
+    // Case 1: DB has more cached data — just increase limit (instant, no API call)
     if (dbCount > limit) {
         currentLimit.value += 15
-        return Result.Success(Unit)  // Instant load!
+
+        // Check isEndReached at the NEW limit position using orderIndex
+        // ⚠️ Do NOT use getLastRemoteKey() — it checks the last article in DB,
+        // not the article at the current visible limit position.
+        val keyAtLimit = localDataSource.getRemoteKeyByOrderIndex(currentLimit.value)
+        return Result.Success(
+            PaginationInfo(
+                hasEndReached = keyAtLimit?.isEndReached ?: false,
+                currentLimit = currentLimit.value
+            )
+        )
     }
 
-    // Otherwise, fetch from API
-    val lastKey = localDataSource.getLastRemoteKey()
-    val nextKey = lastKey?.nextKey ?: return Result.Success(Unit)  // End reached
-    
+    // Case 2: DB exhausted — fetch from API
+    val lastRemoteKey = localDataSource.getLastRemoteKey()
+    val nextKey = lastRemoteKey?.nextKey
+
+    if (lastRemoteKey?.isEndReached == true || nextKey == null) {
+        return Result.Success(PaginationInfo(hasEndReached = true, currentLimit = currentLimit.value))
+    }
+
     val response = remoteDataSource.fetchArticles(keyId = nextKey)
-    // ... upsert and increase limit
+    val hasEndReached = response.pagination?.hasNext == false
+    // ... upsert articles + remote keys (isEndReached = true on last article only)
+    currentLimit.value += 15
+    return Result.Success(PaginationInfo(hasEndReached = hasEndReached, currentLimit = currentLimit.value))
 }
 ```
 
-**Benefits:**
-- Instant "load more" if data already cached
-- Only fetches when truly needed
-- Supports offline browsing of cached pages
+**Key insight — `currentLimit` ↔ `orderIndex`**: `currentLimit` directly maps to `orderIndex`. After incrementing, `getRemoteKeyByOrderIndex(currentLimit.value)` fetches the key for the last *visible* article — giving the correct `isEndReached` for the user's current scroll position.
+
+```kotlin
+// Required DAO query
+@Query("SELECT * FROM news_remote_keys WHERE orderIndex = :orderIndex LIMIT 1")
+suspend fun getRemoteKeyByOrderIndex(orderIndex: Int): NewsRemoteKeysEntity?
+```
 
 ---
 
@@ -492,6 +530,7 @@ When implementing this pattern in a new feature:
 - [ ] Create RemoteKeysDao with:
   - [ ] `getRemoteKeys(id: Long): RemoteKeysEntity?`
   - [ ] `getLastRemoteKey(): RemoteKeysEntity?`
+  - [ ] `getRemoteKeyByOrderIndex(orderIndex: Int): RemoteKeysEntity?`
   - [ ] `@Insert(onConflict = REPLACE)`
   - [ ] `clearRemoteKeys()`
 
@@ -501,10 +540,10 @@ When implementing this pattern in a new feature:
 - [ ] Implement LocalDataSource delegating to DAOs
 - [ ] Create Repository with:
   - [ ] `getItems(): Flow<List<DomainModel>>`
-  - [ ] `refresh(): Result<Unit>`
-  - [ ] `loadNextPage(): Result<Unit>`
+  - [ ] `refresh(): Result<PaginationInfo>`
+  - [ ] `loadNextPage(): Result<PaginationInfo>`
+  - [ ] `isCacheExpired(): Boolean`
   - [ ] `private val currentLimit = MutableStateFlow(15)`
-  - [ ] `private suspend fun checkCacheExpiry()`
 
 ### Domain Layer
 - [ ] Create Repository interface
@@ -606,53 +645,35 @@ fun `loadNextPage should fetch API if DB exhausted`() = runTest {
 
 ## Common Pitfalls
 
-### 1. Forgetting to Add Fresh Keys in Tests
-**Problem:** `checkCacheExpiry()` triggers `refresh()` in tests, resetting limit
+### 1. Using `getLastRemoteKey()` for End Detection When Increasing Limit
+**Problem:** `getLastRemoteKey()` returns the last article in the entire DB. If the DB has 30 articles but you're only showing 15, it will incorrectly report `isEndReached = true`.
 
-**Solution:**
+**Solution:** Use `getRemoteKeyByOrderIndex(currentLimit)` to check the key at the exact visible position:
 ```kotlin
-localDataSource.remoteKeys.add(
+val keyAtLimit = localDataSource.getRemoteKeyByOrderIndex(currentLimit.value)
+return Result.Success(PaginationInfo(hasEndReached = keyAtLimit?.isEndReached ?: false, ...))
+```
+
+### 2. Auto-Refresh Inside `getArticles()` Flow
+**Problem:** Triggering `refresh()` inside the Flow causes race conditions — `loadNextPage()` and `refresh()` can run concurrently on initial load.
+
+**Solution:** Keep `getArticles()` a pure query. Move cache checking to an explicit ViewModel intent (`NewsIntent.CheckExpired`).
+
+### 3. ViewModel Depending on Repository Directly
+**Problem:** Bypasses the domain layer, making the ViewModel harder to test and violating Clean Architecture.
+
+**Solution:** All data access goes through UseCases. `refresh()` and `loadNextPage()` return `Result<PaginationInfo>` so the ViewModel gets pagination metadata without needing a Repository reference.
+
+### 4. Setting `isEndReached = true` on All Articles in Last Page
+**Problem:** `getRemoteKeyByOrderIndex(limit)` will find the wrong key.
+
+**Solution:** Only set `isEndReached = true` on the **last** article of the last page:
+```kotlin
+val remoteKeys = articles.mapIndexed { index, article ->
     NewsRemoteKeysEntity(
-        articleId = 1L,
-        prevKey = null,
-        nextKey = 2,
-        createdAt = Clock.System.now().toEpochMilliseconds(),  // Fresh!
-        orderIndex = 0
+        ...,
+        isEndReached = hasEndReached && index == articles.lastIndex
     )
-)
-```
-
-### 2. Not Using Transactions
-**Problem:** Partial updates leave inconsistent state
-
-**Solution:** Always wrap multi-step DB operations:
-```kotlin
-transactionProvider.runAsTransaction {
-    localDataSource.clearRemoteKeys()
-    localDataSource.upsertArticles(articles)
-    localDataSource.upsertRemoteKeys(keys)
-}
-```
-
-### 3. Blocking UI with checkCacheExpiry
-**Problem:** Calling `refresh()` synchronously blocks Flow emission
-
-**Solution:** Use `CoroutineScope` to launch in background:
-```kotlin
-val scope = CoroutineScope(Dispatchers.Default)
-scope.launch {
-    checkCacheExpiry()
-}
-```
-
-### 4. Not Handling End of Pagination
-**Problem:** Infinite API calls when `nextKeyId` is null
-
-**Solution:** Check for null and return early:
-```kotlin
-val nextKey = lastRemoteKey?.nextKey
-if (nextKey == null) {
-    return Result.Success(Unit)  // End reached
 }
 ```
 
