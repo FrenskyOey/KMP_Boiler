@@ -1,6 +1,5 @@
 package feature.news.domain.usecase.newsfeed
 
-import core.domain.model.Result
 import feature.news.domain.model.Article
 import feature.news.domain.repository.NewsFeedRepository
 import kotlinx.coroutines.flow.Flow
@@ -10,9 +9,5 @@ class GetNewsFeedUseCase(
 ) {
     operator fun invoke(): Flow<List<Article>> {
         return repository.getArticles()
-    }
-
-    suspend  fun isCacheExpired(): Boolean {
-        return repository.isCacheExpired()
     }
 }

@@ -55,6 +55,7 @@ Ask ONLY if ambiguous:
 **For Bug Fixes:**
 - Identify root cause
 - Fix the issue
+- Remove any commented-out or leftover code from the fix
 - Add test if missing
 
 ---

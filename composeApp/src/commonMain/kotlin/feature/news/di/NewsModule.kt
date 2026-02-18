@@ -5,6 +5,7 @@ import feature.news.data.api.NewsApiService
 import feature.news.data.api.NewsApiServiceImp
 import feature.news.data.repository.NewsFeedRepositoryImpl
 import feature.news.domain.repository.NewsFeedRepository
+import feature.news.domain.usecase.newsfeed.CheckCacheExpiredUseCase
 import feature.news.domain.usecase.newsfeed.GetNewsFeedUseCase
 import feature.news.domain.usecase.newsfeed.LoadMoreNewsUseCase
 import feature.news.domain.usecase.newsfeed.RefreshNewsFeedUseCase
@@ -47,8 +48,9 @@ val newsModule = module {
     factoryOf(::GetNewsFeedUseCase)
     factoryOf(::RefreshNewsFeedUseCase)
     factoryOf(::LoadMoreNewsUseCase)
+    factoryOf(::CheckCacheExpiredUseCase)
 
-    factory { NewsFeedViewModel(get(), get(), get()) }
+    factory { NewsFeedViewModel(get(), get(), get(), get()) }
     factoryOf(::SettingsViewModel)
 
     // --- News Detail ---

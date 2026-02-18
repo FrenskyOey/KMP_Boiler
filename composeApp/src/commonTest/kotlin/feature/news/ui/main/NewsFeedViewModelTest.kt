@@ -5,6 +5,7 @@ import core.domain.model.Result
 import feature.news.domain.model.Article
 import feature.news.domain.model.PaginationInfo
 import feature.news.domain.repository.NewsFeedRepository
+import feature.news.domain.usecase.newsfeed.CheckCacheExpiredUseCase
 import feature.news.domain.usecase.newsfeed.GetNewsFeedUseCase
 import feature.news.domain.usecase.newsfeed.LoadMoreNewsUseCase
 import feature.news.domain.usecase.newsfeed.RefreshNewsFeedUseCase
@@ -44,11 +45,13 @@ class NewsFeedViewModelTest {
         val getNewsFeedUseCase = GetNewsFeedUseCase(fakeRepository)
         val refreshUseCase = RefreshNewsFeedUseCase(fakeRepository)
         val loadMoreUseCase = LoadMoreNewsUseCase(fakeRepository)
+        val checkCacheExpiredUseCase = CheckCacheExpiredUseCase(fakeRepository)
         
         viewModel = NewsFeedViewModel(
             getNewsFeedUseCase = getNewsFeedUseCase,
             refreshNewsFeedUseCase = refreshUseCase,
-            loadMoreNewsUseCase = loadMoreUseCase
+            loadMoreNewsUseCase = loadMoreUseCase,
+            checkCacheExpiredUseCase = checkCacheExpiredUseCase
         )
     }
     

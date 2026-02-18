@@ -3,6 +3,7 @@ package feature.news.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import core.domain.model.Result
+import feature.news.domain.usecase.newsfeed.CheckCacheExpiredUseCase
 import feature.news.domain.usecase.newsfeed.GetNewsFeedUseCase
 import feature.news.domain.usecase.newsfeed.LoadMoreNewsUseCase
 import feature.news.domain.usecase.newsfeed.RefreshNewsFeedUseCase
@@ -19,7 +20,8 @@ import kotlinx.coroutines.launch
 class NewsFeedViewModel(
     private val getNewsFeedUseCase: GetNewsFeedUseCase,
     private val refreshNewsFeedUseCase: RefreshNewsFeedUseCase,
-    private val loadMoreNewsUseCase: LoadMoreNewsUseCase
+    private val loadMoreNewsUseCase: LoadMoreNewsUseCase,
+    private val checkCacheExpiredUseCase: CheckCacheExpiredUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NewsState())
@@ -34,10 +36,8 @@ class NewsFeedViewModel(
 
     private fun checkCacheAndRefreshIfNeeded() {
         viewModelScope.launch {
-            // Only check cache if we have data
-            // If no data, let UI trigger initial load via loadNextPage
-            val isExpired = getNewsFeedUseCase.isCacheExpired()
-            if (_uiState.value.articles.isEmpty() || isExpired){
+            val isExpired = checkCacheExpiredUseCase()
+            if (_uiState.value.articles.isEmpty() || isExpired) {
                 refresh()
             }
         }

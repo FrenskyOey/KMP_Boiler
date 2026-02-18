@@ -34,4 +34,8 @@ class FakeNewsRemoteKeysDao : NewsRemoteKeysDao {
     override suspend fun clearRemoteKeysAfter(orderIndex: Int) {
         keys.removeAll { it.orderIndex > orderIndex }
     }
+
+    override suspend fun getCount(): Int {
+        return keys.size
+    }
 }
